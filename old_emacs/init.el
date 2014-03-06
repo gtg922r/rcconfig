@@ -3,6 +3,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes (quote ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(doc-view-continuous t)
  '(doc-view-ghostscript-options (quote ("-dNOSAFER" "-dNOPAUSE" "-sDEVICE=png16m" "-dTextAlphaBits=4" "-dBATCH" "-dGraphicsAlphaBits=4" "-dQUIET")))
  '(doc-view-ghostscript-program "/usr/local/bin/gs")
@@ -18,21 +19,22 @@
  ;; If there is more than one, they won't work right.
  )
 
-;; Select Color Theme
-(add-to-list 'load-path "~/.emacs.d/colors/")
-(require 'color-theme)
-(add-to-list 'load-path "~/.emacs.d/emacs-color-theme-solarized/")
-(require 'color-theme-solarized)
-
+;; Package Archives
+(require 'package)
+(add-to-list 'package-archives
+  '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(package-initialize)
+(powerline-center-theme)
+(load-theme 'solarized-dark)
 
 ;; Set Environment Path
 (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin:/usr/texbin:/opt/local/bin"))
 (setq exec-path (append exec-path '("/usr/local/bin:/usr/texbin:/opt/local/bin")))
 
 ;; Set registers to common files
-(set-register ?e (cons 'file "~/.emacs"))
+(set-register ?e (cons 'file "~/.emacs.d/init.el"))
 (set-register ?r (cons 'file "~/Dropbox/Simplenote/ws_tasklist.txt"))
-(color-theme-solarized-dark)
+
 
 
  ;; Set Visual Line Mode for text files
@@ -53,6 +55,10 @@
 (add-to-list 'auto-mode-alist '("\\.txt\\'" . gfm-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . gfm-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
+
+;; Podfile settings
+(add-to-list 'auto-mode-alist '("\\.podspec\\'" . ruby-mode))
+(add-to-list 'auto-mode-alist '("\\Podfile\\'" . ruby-mode))
 
 ;; Auctex Settings
 (setq TeX-auto-save t)
@@ -100,7 +106,7 @@
    backup-directory-alist
     '(("." . "~/.emacs.d/.autosaves"))    ; don't litter my fs tree
    delete-old-versions t
-   kept-new-versions 6
+   Kept-New-Versions 6
    kept-old-versions 2
    version-control t)       ; use versioned backups
 
@@ -115,7 +121,6 @@
 ;; Instead, just use OCTAVE mode
 (add-to-list 'auto-mode-alist '("\\.m\\'" . octave-mode))
 
-
 ;; one line at a time
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 4))) 
 ;; don't accelerate scrolling
@@ -129,4 +134,4 @@
 
 ;; Use CEDET
 ;(global-ede-mode 1)                      ; Enable the Project management system
-;(semantic-mode 1)
+;(semantic-mode 
