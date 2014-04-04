@@ -3,11 +3,11 @@
 
 (depends-on "cask")
 (depends-on "dash")
-(depends-on "deft")
 (depends-on "dos")
 (depends-on "epl")
-(depends-on "markdown-mode")
 (depends-on "pallet")
 (depends-on "powerline")
 (depends-on "rainbow-mode")
 (depends-on "solarized-theme")
+(depends-on "markdown-mode")
+(depends-on "deft")
