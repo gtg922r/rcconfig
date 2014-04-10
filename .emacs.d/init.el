@@ -1,8 +1,15 @@
+;;    ___  _____  _____          ____     
+;;   / _ \/ ___/ / ___/__  ___  / _(_)__ _
+;;  / , _/ /__  / /__/ _ \/ _ \/ _/ / _ `/
+;; /_/|_|\___/  \___/\___/_//_/_//_/\_, / 
+;;                                 /___/ 
+
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
 
 ;; Load Theme
 (load-theme 'solarized-dark t)
+(setq solarized-high-contrast-mode-line t)
 
 ;; Load Powerline
 (powerline-default-theme)
@@ -178,6 +185,15 @@
 ;; Instead, just use OCTAVE mode
 (add-to-list 'auto-mode-alist '("\\.m\\'" . octave-mode))
 
+;; Kill current buffer... because isnt that what you want to do anyway?
+(global-set-key (kbd "C-x C-k") (lambda()(interactive)(kill-buffer nil)))
+
+;; Move around buffers all easy like
+(windmove-default-keybindings)
+(global-set-key (kbd "C-M-d") `windmove-right)
+(global-set-key (kbd "C-M-a") `windmove-left)
+(global-set-key (kbd "C-M-w") `windmove-up)
+(global-set-key (kbd "C-M-s") `windmove-down)
 ;; Deft
 (setq deft-directory "~/Dropbox/RPC_Work_Documents/WS_Notes")
 (setq deft-text-mode 'gfm-mode)
