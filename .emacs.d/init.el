@@ -18,36 +18,39 @@
 (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin:/usr/texbin:/opt/local/bin"))
 (setq exec-path (append exec-path '("/usr/local/bin" "/usr/texbin" "/opt/local/bin")))
 
+
 ;; Set registers to common files
 (set-register ?t (cons 'file "~/Dropbox/RPC_Work_Documents/WS_Notes/tasklist.org"))
 (set-register ?s (cons 'file "~/Dropbox/RPC_Work_Documents/WS_Notes/scratchpad.md"))
 (set-register ?e (cons 'file "~/.emacs.d/init.el"))
 (set-register ?c (cons 'file "~/.emacs.d/cask"))
-;;(set-register ?r (cons 'file "~/Dropbox/Simplenote/ws_tasklist.txt"))
 
 ;; Clean up windows
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
+;; Its line numbers all the way day
+(global-linum-mode t)
+
 ;; Default Font
 (set-default-font "Anonymous Pro 11")
+(add-to-list 'default-frame-alist '(font . "Anonymous Pro 11"  ))
 
 ;; Set Git-hub Flavored Markdown
 (setq markdown-command "pandoc -f markdown_github -t html5 --mathjax -H ~/.emacs.d/markdown/style_include.css")
 
 ;; Setup modes
 ;; Set Markdown mode for text, md files, and git merge message
-(autoload 'gfm-mode "markdown-mode"
-   "Major mode for editing Markdown files" t)
-(add-to-list 'auto-mode-alist '("\\.text\\'" . gfm-mode))
-(add-to-list 'auto-mode-alist '("\\.txt\\'" . gfm-mode))
+(autoload 'gfm-mode "markdown-mode" "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.text\\'"     . gfm-mode))
+(add-to-list 'auto-mode-alist '("\\.txt\\'"      . gfm-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . gfm-mode))
-(add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'"       . gfm-mode))
 
 (add-to-list 'auto-mode-alist '("COMMIT_EDITMSG" . gfm-mode))
-(add-to-list 'auto-mode-alist '("NOTES_EDITMSG" . gfm-mode))
-(add-to-list 'auto-mode-alist '("MERGE_MSG" . gfm-mode))
-(add-to-list 'auto-mode-alist '("TAG_EDITMSG" . gfm-mode))
+(add-to-list 'auto-mode-alist '("NOTES_EDITMSG"  . gfm-mode))
+(add-to-list 'auto-mode-alist '("MERGE_MSG"      . gfm-mode))
+(add-to-list 'auto-mode-alist '("TAG_EDITMSG"    . gfm-mode))
 
 ;; Markdown References go at the end
 (setq markdown-reference-location 'end)
@@ -55,7 +58,7 @@
 ;; Bind C-c k in gfm and markdown to start kokoi for automatic pandoc conversion and preview
 (defun rc-start-kokoi-in-WS-notes ()
   (interactive)
-  (async-shell-command "kokoi --command \"pandoc -f markdown_github -t html5 --mathjax -H ~/.emacs.d/markdown/style_include.css\" --save --mathjax --extensions \"md\" ~/Dropbox/RPC_Work_Documents/WS_Notes/"))
+  (async-shell-command "kokoi --command \"pandoc -f markdown_github -t html5 --mathjax -H ~/.emacs.d/markdown/style_include.css\" --save --extensions \"md\" ~/Dropbox/RPC_Work_Documents/WS_Notes/"))
   
 (add-hook 'gfm-mode-hook      (lambda()(local-set-key (kbd "C-c k") 'rc-start-kokoi-in-WS-notes)))
 (add-hook 'markdown-mode-hook (lambda()(local-set-key (kbd "C-c k") 'rc-start-kokoi-in-WS-notes)))
@@ -66,7 +69,7 @@
 
 ;; Turn on iimage in markdown-mode
 (add-hook 'markdown-mode-hook 'turn-on-iimage-mode)
-(add-hook 'gfm-mode-hook 'turn-on-iimage-mode)
+(add-hook 'gfm-mode-hook      'turn-on-iimage-mode)
 
 ;; Toggle iimage with C-c i
 (add-hook 'gfm-mode-hook      (lambda()(local-set-key (kbd "C-c i") 'iimage-mode)))
@@ -92,29 +95,15 @@
   (unless(file-exists-p local-screenshot-directory)
     (message "Creating image directoy")
     (make-directory local-screenshot-directory))
-  (setq 
-   local-screenshot-directory-relative
-   (concat
-    "./images/"
-    (file-name-base(buffer-file-name))))
+  (setq local-screenshot-directory-relative
+   (concat "./images/" (file-name-base(buffer-file-name))))
   (setq local-screenshot-url (concat local-screenshot-directory-relative "/" image-name ".png"))
   (rc-countdown-with-alert 3)
   (message "Select Screen Area")
-  (rc-shell-notify
-   ""
-   "Select Screen Area for Capture"
-   ""
-   "Purr") 
+  (rc-shell-notify "" "Select Screen Area for Capture" "" "Purr")
   (shell-command (concat
    "screencapture -i \""
-   (concat 
-    local-screenshot-directory
-    "/"
-    image-name
-    ".png"
-    )
-   "\""
-   ))
+   (concat local-screenshot-directory "/" image-name ".png") "\""))
   (rc-shell-hide-notifications)
   (if reference
       (progn (insert "!")
@@ -166,20 +155,22 @@
 (defun rc-shell-hide-notifications ()
   (interactive)
   (message "removing")
-  (shell-command-to-string "terminal-notifier -remove ALL -sender org.gnu.Emacs")
-)
+  (shell-command-to-string "terminal-notifier -remove ALL -sender org.gnu.Emacs"))
 
 ;; Setup Dos-mode for batch file
 (add-to-list 'auto-mode-alist '("\\.bat\\'" . dos-mode))
 
 ;; Podfile settings
 (add-to-list 'auto-mode-alist '("\\.podspec\\'" . ruby-mode))
-(add-to-list 'auto-mode-alist '("\\Podfile\\'" . ruby-mode))
+(add-to-list 'auto-mode-alist '("\\Podfile\\'"  . ruby-mode))
 
 ;; Modes for rainbow mode
-(add-hook 'emacs-lisp-mode-hook 'my-emacs-mode-hook)
-(defun my-emacs-mode-hook ()
+(defun rainbow-activate ()
   (rainbow-mode 1))
+(add-hook 'emacs-lisp-mode-hook 'rainbow-activate)
+(add-hook 'css-mode-hook 'rainbow-activate)
+(add-hook 'html-mode-hook 'rainbow-activate)
+
 
 ;; MATLAB files
 ;; Instead, just use OCTAVE mode
@@ -190,10 +181,11 @@
 
 ;; Move around buffers all easy like
 (windmove-default-keybindings)
-(global-set-key (kbd "C-M-d") `windmove-right)
-(global-set-key (kbd "C-M-a") `windmove-left)
-(global-set-key (kbd "C-M-w") `windmove-up)
-(global-set-key (kbd "C-M-s") `windmove-down)
+(global-set-key (kbd "C-M-l") `windmove-right)
+(global-set-key (kbd "C-M-j") `windmove-left)
+(global-set-key (kbd "C-M-i") `windmove-up)
+(global-set-key (kbd "C-M-k") `windmove-down)
+
 ;; Deft
 (setq deft-directory "~/Dropbox/RPC_Work_Documents/WS_Notes")
 (setq deft-text-mode 'gfm-mode)
@@ -202,32 +194,28 @@
 (global-set-key (kbd "<f8>") 'deft) ; Ctrl+X,Ctrl+J
 
 (defun rc-grep-todos-in-dir (dir &optional not-recursive)
-"Grep recursively for TODO comments in the given directory"
-(interactive "Ddirectory:")
-(let ((recur "-r"))
-(if not-recursive
-(setq recur "")
-)
-(grep (concat "grep -nH -I " recur " -E \"[\\#\\/\\-\\;\\*]\s*TODO|FIXME|XXX:?\" " dir " 2>/dev/null"))
-)
-(enlarge-window 7)
-)
+  "Grep recursively for TODO comments in the given directory"
+  (interactive "Ddirectory:")
+  (let ((recur "-r"))
+    (if not-recursive
+        (setq recur ""))
+    (grep (concat "grep -nH -I " recur " -E \"[\\#\\/\\-\\;\\*]\s*TODO|FIXME|XXX:?\" " dir " 2>/dev/null")))
+  (enlarge-window 7))
+
 (global-set-key [f5] 'rc-grep-todos-in-dir)
 
 ;; Insert Data Macro
 (defun insert-date (prefix)
-    "Insert the current date. With prefix-argument, use ISO format. With
+  "Insert the current date. With prefix-argument, use ISO format. With
    two prefix arguments, write out the day and month name."
-    (interactive "P")
-    (let ((format (cond
-                   ((not prefix) "%Y-%m-%d")
-                   ((equal prefix '(4)) "%b %d, %Y")
-                   ((equal prefix '(16)) "%A, %d. %B %Y")))
-          )
-      (insert (format-time-string format))))
+  (interactive "P")
+  (let ((format (cond
+                 ((not prefix) "%Y-%m-%d")
+                 ((equal prefix '(4)) "%b %d, %Y")
+                 ((equal prefix '(16)) "%A, %d. %B %Y"))))
+    (insert (format-time-string format))))
 
 (global-set-key (kbd "C-c d") 'insert-date)
-
 
 ;; Set all auto-saves to happen in central folder
 (setq
@@ -267,14 +255,14 @@ This is used by `global-hl-todo-mode'."
 
 (defcustom hl-todo-keyword-faces
   '(("HOLD" . "#d0bf8f")
-    ("TODO" . "#ff0000")
+    ("TODO" . "#dc322f")
     ("NEXT" . "#dca3a3")
     ("THEM" . "#dc8cc3")
     ("PROG" . "#7cb8bb")
     ("OKAY" . "#7cb8bb")
     ("DONT" . "#5f7f5f")
     ("FAIL" . "#8c5353")
-    ("DONE" . "##2aa198")
+    ("DONE" . "#2aa198")
     ("FIXME" . "#cc9393")
     ("XXX"   . "#cc9393")
     ("XXXX"  . "#cc9393")
@@ -322,7 +310,7 @@ This is used by `global-hl-todo-mode'."
 ;; End:
 ;;; hl-todo.el ends here
 
-;; Modes for rainbow mode
+;; Modes for hl-todo mode
 (add-hook 'emacs-lisp-mode-hook 'hl-todo-mode)
 (add-hook 'gfm-mode-hook 'hl-todo-mode)
 (add-hook 'markdown-mode-hook 'hl-todo-mode)
@@ -353,3 +341,21 @@ This is used by `global-hl-todo-mode'."
         (progn (setq old-fullscreen current-value)
           'fullboth)))))
 (global-set-key [s-escape] 'toggle-fullscreen)
+
+
+
+;; MATLAB
+;; Setting up matlab-mode
+;; To Get code: 
+;; cvs -d:pserver:anonymous@matlab-emacs.cvs.sourceforge.net:/cvsroot/matlab-emacs login
+;; cvs -z3 -d:pserver:anonymous@matlab-emacs.cvs.sourceforge.net:/cvsroot/matlab-emacs co -P matlab-emacs
+(setq exec-path (append exec-path '("/Applications/MATLAB_R2012b.app/bin/")))
+(add-to-list 'load-path "~/.emacs.d/matlab")
+(load-library "matlab-load")
+(custom-set-variables
+ '(matlab-shell-command-switches '("-nodesktop -nosplash")))
+(add-hook 'matlab-mode-hook 'auto-complete-mode)
+(setq auto-mode-alist
+    (cons
+     '("\\.m$" . matlab-mode)
+     auto-mode-alist))
