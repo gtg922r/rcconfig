@@ -1,4 +1,4 @@
-;;    ___  _____  _____          ____     
+;    ___  _____  _____          ____     
 ;;   / _ \/ ___/ / ___/__  ___  / _(_)__ _
 ;;  / , _/ /__  / /__/ _ \/ _ \/ _/ / _ `/
 ;; /_/|_|\___/  \___/\___/_//_/_//_/\_, / 
@@ -257,15 +257,15 @@ This is used by `global-hl-todo-mode'."
   '(("HOLD" . "#d0bf8f")
     ("TODO" . "#dc322f")
     ("NEXT" . "#dca3a3")
-    ("THEM" . "#dc8cc3")
+    ("SQWK" . "#dc8cc3")
     ("PROG" . "#7cb8bb")
     ("OKAY" . "#7cb8bb")
-    ("DONT" . "#5f7f5f")
+    ("ELSE" . "#5f7f5f")
     ("FAIL" . "#8c5353")
     ("DONE" . "#2aa198")
     ("FIXME" . "#cc9393")
     ("XXX"   . "#cc9393")
-    ("XXXX"  . "#cc9393")
+    ("NOTE"  . "#cc9393")
     ("???"   . "#cc9393"))
   "Faces used to highlight specific TODO keywords."
   :group 'hl-todo
