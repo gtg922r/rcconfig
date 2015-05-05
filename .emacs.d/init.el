@@ -7,6 +7,13 @@
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
 
+;; Get rid of annoying start-up screen
+(setq inhibit-startup-screen t)
+
+;; Set registers to common files (do it now, before things that may fail)
+(set-register ?e (cons 'file "~/.emacs.d/init.el"))
+(set-register ?c (cons 'file "~/.emacs.d/cask"))
+
 ;; Load Theme
 (load-theme 'solarized-dark t)
 (setq solarized-high-contrast-mode-line t)
@@ -18,23 +25,35 @@
 (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin:/usr/texbin:/opt/local/bin"))
 (setq exec-path (append exec-path '("/usr/local/bin" "/usr/texbin" "/opt/local/bin")))
 
-
-;; Set registers to common files
-(set-register ?t (cons 'file "~/Dropbox/RPC_Work_Documents/WS_Notes/tasklist.org"))
-(set-register ?s (cons 'file "~/Dropbox/RPC_Work_Documents/WS_Notes/scratchpad.md"))
-(set-register ?e (cons 'file "~/.emacs.d/init.el"))
-(set-register ?c (cons 'file "~/.emacs.d/cask"))
-
 ;; Clean up windows
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
-;; Its line numbers all the way day
+;; Its line numbers all the way down
 (global-linum-mode t)
 
 ;; Default Font
-(set-default-font "Anonymous Pro 11")
-(add-to-list 'default-frame-alist '(font . "Anonymous Pro 11"  ))
+;; set default font in initial window and for any new window
+(cond
+ ((string-equal system-type "windows-nt") ; Microsoft Windows
+  (when (member "DejaVu Sans Mono" (font-family-list))
+    (add-to-list 'initial-frame-alist '(font . "DejaVu Sans Mono-10"))
+    (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-10"))
+    )
+  )
+ ((string-equal system-type "darwin")   ; Mac OS X
+  (when (member "Anonymous Pro" (font-family-list))
+    (set-default-font "Anonymous Pro 11")
+    (add-to-list 'default-frame-alist '(font . "Anonymous Pro 11"  ))
+    )
+  )
+ ((string-equal system-type "gnu/linux") ; linux
+  (when (member "Ubuntu Mono" (font-family-list))
+    (set-default-font "Ubuntu Mono 10")
+    (add-to-list 'default-frame-alist '(font . "Ubuntu Mono 10"  ))
+    )
+  )
+)
 
 ;; Set Git-hub Flavored Markdown
 (setq markdown-command "pandoc -f markdown_github -t html5 --mathjax -H ~/.emacs.d/markdown/style_include.css")
@@ -187,19 +206,16 @@
 (global-set-key (kbd "C-M-k") `windmove-down)
 
 ;; Deft
-(setq deft-directory "~/Dropbox/RPC_Work_Documents/WS_Notes")
+(setq deft-directory "~/Documents/Notes")
 (setq deft-text-mode 'gfm-mode)
 (setq deft-extension "md")
 (global-set-key (kbd "C-x C-j") 'deft) ; Ctrl+X,Ctrl+J
 (global-set-key (kbd "<f8>") 'deft) ; Ctrl+X,Ctrl+J
 
-(defun rc-grep-todos-in-dir (dir &optional not-recursive)
+(defun rc-grep-todos-in-dir ()
   "Grep recursively for TODO comments in the given directory"
-  (interactive "Ddirectory:")
-  (let ((recur "-r"))
-    (if not-recursive
-        (setq recur ""))
-    (grep (concat "grep -nH -I " recur " -E \"[\\#\\/\\-\\;\\*]\s*TODO|FIXME|XXX:?\" " dir " 2>/dev/null")))
+  (interactive)
+  (grep (concat "grep -EIr \"TODO\" . 2>/dev/null"))
   (enlarge-window 7))
 
 (global-set-key [f5] 'rc-grep-todos-in-dir)
@@ -263,10 +279,11 @@ This is used by `global-hl-todo-mode'."
     ("ELSE" . "#5f7f5f")
     ("FAIL" . "#8c5353")
     ("DONE" . "#2aa198")
+    ("AAA"  . "#2aa198")
     ("FIXME" . "#cc9393")
     ("XXX"   . "#cc9393")
     ("NOTE"  . "#cc9393")
-    ("???"   . "#cc9393"))
+    ("QQQ"   . "#cc9393"))
   "Faces used to highlight specific TODO keywords."
   :group 'hl-todo
   :type '(repeat (cons (string :tag "Keyword")
@@ -314,6 +331,7 @@ This is used by `global-hl-todo-mode'."
 (add-hook 'emacs-lisp-mode-hook 'hl-todo-mode)
 (add-hook 'gfm-mode-hook 'hl-todo-mode)
 (add-hook 'markdown-mode-hook 'hl-todo-mode)
+(add-hook `grep-mode-hook 'hl-todo-mode)
 
 
 ;; Rename File and Buffer
@@ -342,20 +360,23 @@ This is used by `global-hl-todo-mode'."
           'fullboth)))))
 (global-set-key [s-escape] 'toggle-fullscreen)
 
+;; Set Default Frame Size
+(defun set-frame-size-according-to-resolution ()
+  (interactive)
+  (if window-system
+  (progn
+    ;; use 120 char wide window for largeish displays
+    ;; and smaller 80 column windows for smaller displays
+    ;; pick whatever numbers make sense for you
+    (if (> (x-display-pixel-width) 1280)
+           (add-to-list 'default-frame-alist (cons 'width 120))
+           (add-to-list 'default-frame-alist (cons 'width 80)))
+    ;; for the height, subtract a couple hundred pixels
+    ;; from the screen height (for panels, menubars and
+    ;; whatnot), then divide by the height of a char to
+    ;; get the height we want
+    (add-to-list 'default-frame-alist 
+         (cons 'height (/ (- (x-display-pixel-height) 200)
+                             (frame-char-height)))))))
 
-
-;; MATLAB
-;; Setting up matlab-mode
-;; To Get code: 
-;; cvs -d:pserver:anonymous@matlab-emacs.cvs.sourceforge.net:/cvsroot/matlab-emacs login
-;; cvs -z3 -d:pserver:anonymous@matlab-emacs.cvs.sourceforge.net:/cvsroot/matlab-emacs co -P matlab-emacs
-(setq exec-path (append exec-path '("/Applications/MATLAB_R2012b.app/bin/")))
-(add-to-list 'load-path "~/.emacs.d/matlab")
-(load-library "matlab-load")
-(custom-set-variables
- '(matlab-shell-command-switches '("-nodesktop -nosplash")))
-(add-hook 'matlab-mode-hook 'auto-complete-mode)
-(setq auto-mode-alist
-    (cons
-     '("\\.m$" . matlab-mode)
-     auto-mode-alist))
+(set-frame-size-according-to-resolution)
