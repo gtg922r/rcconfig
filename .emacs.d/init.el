@@ -42,6 +42,10 @@
     )
   )
  ((string-equal system-type "darwin")   ; Mac OS X
+  (when (member "Monaco" (font-family-list))
+    (set-default-font "Monaco 11")
+    (add-to-list 'default-frame-alist '(font . "Monaco 11"  ))
+    )
   (when (member "Anonymous Pro" (font-family-list))
     (set-default-font "Anonymous Pro 11")
     (add-to-list 'default-frame-alist '(font . "Anonymous Pro 11"  ))
