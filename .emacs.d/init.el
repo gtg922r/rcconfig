@@ -12,7 +12,7 @@
 
 ;; Set registers to common files (do it now, before things that may fail)
 (set-register ?e (cons 'file "~/.emacs.d/init.el"))
-(set-register ?c (cons 'file "~/.emacs.d/cask"))
+(set-register ?c (cons 'file "~/.emacs.d/Cask"))
 
 ;; Load Theme
 (load-theme 'solarized-dark t)
@@ -281,6 +281,7 @@ This is used by `global-hl-todo-mode'."
     ("PROG" . "#7cb8bb")
     ("OKAY" . "#7cb8bb")
     ("ELSE" . "#5f7f5f")
+    ("WONT" . "#2a7f5f")
     ("FAIL" . "#8c5353")
     ("DONE" . "#2aa198")
     ("AAA"  . "#2aa198")
