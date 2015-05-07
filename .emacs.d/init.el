@@ -22,8 +22,8 @@
 (powerline-default-theme)
 
 ;; Set Environment Path
-(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin:/usr/texbin:/opt/local/bin"))
-(setq exec-path (append exec-path '("/usr/local/bin" "/usr/texbin" "/opt/local/bin")))
+(setenv "PATH" (concat (getenv "PATH") ":~/homebrew/bin:/usr/local/bin:/usr/texbin:/opt/local/bin"))
+(setq exec-path (append exec-path '("~/homebrew/bin" "/usr/local/bin" "/usr/texbin" "/opt/local/bin")))
 
 ;; Clean up windows
 (tool-bar-mode -1)
@@ -33,31 +33,20 @@
 (global-linum-mode t)
 
 ;; Default Font
-;; set default font in initial window and for any new window
 (cond
- ((string-equal system-type "windows-nt") ; Microsoft Windows
-  (when (member "DejaVu Sans Mono" (font-family-list))
-    (add-to-list 'initial-frame-alist '(font . "DejaVu Sans Mono-10"))
-    (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-10"))
-    )
+ ((member "Anonymous Pro" (font-family-list))
+  (set-default-font "Anonymous Pro 11")
+  (add-to-list 'default-frame-alist '(font . "Anonymous Pro 11"  ))
   )
- ((string-equal system-type "darwin")   ; Mac OS X
-  (when (member "Monaco" (font-family-list))
-    (set-default-font "Monaco 11")
-    (add-to-list 'default-frame-alist '(font . "Monaco 11"  ))
-    )
-  (when (member "Anonymous Pro" (font-family-list))
-    (set-default-font "Anonymous Pro 11")
-    (add-to-list 'default-frame-alist '(font . "Anonymous Pro 11"  ))
-    )
+ ((member "Ubuntu Mono" (font-family-list))
+  (set-default-font "Ubuntu Mono 10")
+  (add-to-list 'default-frame-alist '(font . "Ubuntu Mono 10"  ))
   )
- ((string-equal system-type "gnu/linux") ; linux
-  (when (member "Ubuntu Mono" (font-family-list))
-    (set-default-font "Ubuntu Mono 10")
-    (add-to-list 'default-frame-alist '(font . "Ubuntu Mono 10"  ))
-    )
+ ((member "Monaco" (font-family-list))
+  (set-default-font "Monaco 10")
+  (add-to-list 'default-frame-alist '(font . "Monaco 11"  ))
   )
-)
+ )
 
 ;; Set Git-hub Flavored Markdown
 (setq markdown-command "pandoc -f markdown_github -t html5 --mathjax -H ~/.emacs.d/markdown/style_include.css")
@@ -79,12 +68,32 @@
 (setq markdown-reference-location 'end)
 
 ;; Bind C-c k in gfm and markdown to start kokoi for automatic pandoc conversion and preview
-(defun rc-start-kokoi-in-WS-notes ()
+(defun rc-start-kokoi-in-notes ()
   (interactive)
-  (async-shell-command "kokoi --command \"pandoc -f markdown_github -t html5 --mathjax -H ~/.emacs.d/markdown/style_include.css\" --save --extensions \"md\" ~/Dropbox/RPC_Work_Documents/WS_Notes/"))
-  
-(add-hook 'gfm-mode-hook      (lambda()(local-set-key (kbd "C-c k") 'rc-start-kokoi-in-WS-notes)))
-(add-hook 'markdown-mode-hook (lambda()(local-set-key (kbd "C-c k") 'rc-start-kokoi-in-WS-notes)))
+  (async-shell-command (concat "kokoi --command \"pandoc -f markdown_github -t html5 --mathjax -H ~/.emacs.d/markdown/style_include.css\" --save --extensions \"md\"" deft-directory)))
+
+(defun rc-unison-sync-notes ()
+  (interactive)
+  (if (string-equal system-type "gnu/linux") ; If on linux, dont run unison
+      (message "Currently on Linux, Unison configured for remote Mac")
+      (progn
+        (message "Launching Unison...")
+        (shell-command "~/homebrew/bin/unison Notes")
+        (message "Unison Complete!"))
+      )
+  )
+
+;; In Markdown/Likely Deft documents allow keyshorcuts to start kokoi or launch unison
+;;   since we will be running unison, auto-revert these modes (they are auto-save so should be ok)
+
+(add-hook 'gfm-mode-hook      (lambda()(local-set-key (kbd "C-c k") 'rc-start-kokoi-in-notes)))
+(add-hook 'markdown-mode-hook (lambda()(local-set-key (kbd "C-c k") 'rc-start-kokoi-in-notes)))
+
+(add-hook 'gfm-mode-hook      (lambda()(local-set-key (kbd "C-c u") 'rc-unison-sync-notes)))
+(add-hook 'markdown-mode-hook (lambda()(local-set-key (kbd "C-c u") 'rc-unison-sync-notes)))
+
+(add-hook 'markdown-mode-hook 'auto-revert-mode)
+(add-hook 'gfm-mode-hook 'auto-revert-mode)
 
 ;; Enable Flyspell in gfm and markdown
 (add-hook 'gfm-mode-hook      'flyspell-mode)
@@ -219,7 +228,7 @@
 (defun rc-grep-todos-in-dir ()
   "Grep recursively for TODO comments in the given directory"
   (interactive)
-  (grep (concat "grep -EIr \"TODO\" . 2>/dev/null"))
+  (grep (concat "grep -EIr \"TODO\" " deft-directory  " 2>/dev/null"))
   (enlarge-window 7))
 
 (global-set-key [f5] 'rc-grep-todos-in-dir)
@@ -281,6 +290,7 @@ This is used by `global-hl-todo-mode'."
     ("PROG" . "#7cb8bb")
     ("OKAY" . "#7cb8bb")
     ("ELSE" . "#5f7f5f")
+    ("WONT" . "#2a7f5f")
     ("FAIL" . "#8c5353")
     ("DONE" . "#2aa198")
     ("AAA"  . "#2aa198")
@@ -326,6 +336,7 @@ This is used by `global-hl-todo-mode'."
 
 (provide 'hl-todo)
 
+
 ;; Local Variables:
 ;; indent-tabs-mode: nil
 ;; End:
@@ -335,8 +346,7 @@ This is used by `global-hl-todo-mode'."
 (add-hook 'emacs-lisp-mode-hook 'hl-todo-mode)
 (add-hook 'gfm-mode-hook 'hl-todo-mode)
 (add-hook 'markdown-mode-hook 'hl-todo-mode)
-(add-hook `grep-mode-hook 'hl-todo-mode)
-
+(add-hook 'grep-mode-hook 'hl-todo-mode)
 
 ;; Rename File and Buffer
 (defun rename-file-and-buffer ()
