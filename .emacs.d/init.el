@@ -34,13 +34,13 @@
 
 ;; Default Font
 (cond
- ((member "Anonymous Pro" (font-family-list))
-  (set-default-font "Anonymous Pro 11")
-  (add-to-list 'default-frame-alist '(font . "Anonymous Pro 11"  ))
-  )
  ((member "Ubuntu Mono" (font-family-list))
   (set-default-font "Ubuntu Mono 10")
   (add-to-list 'default-frame-alist '(font . "Ubuntu Mono 10"  ))
+  )
+ ((member "Anonymous Pro" (font-family-list))
+  (set-default-font "Anonymous Pro 10")
+  (add-to-list 'default-frame-alist '(font . "Anonymous Pro 11"  ))
   )
  ((member "Monaco" (font-family-list))
   (set-default-font "Monaco 10")
