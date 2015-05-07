@@ -78,8 +78,7 @@
       (message "Currently on Linux, Unison configured for remote Mac")
       (progn
         (message "Launching Unison...")
-        (shell-command "~/homebrew/bin/unison Notes")
-        (message "Unison Complete!"))
+        (shell-command "~/homebrew/bin/unison Notes"))
       )
   )
 
