@@ -12,7 +12,7 @@
 
 ;; Set registers to common files (do it now, before things that may fail)
 (set-register ?e (cons 'file "~/.emacs.d/init.el"))
-(set-register ?c (cons 'file "~/.emacs.d/cask"))
+(set-register ?c (cons 'file "~/.emacs.d/Cask"))
 
 ;; Load Theme
 (load-theme 'solarized-dark t)
