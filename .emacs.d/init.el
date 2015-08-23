@@ -223,6 +223,7 @@
 (setq deft-extension "md")
 (global-set-key (kbd "C-x C-j") 'deft) ; Ctrl+X,Ctrl+J
 (global-set-key (kbd "<f8>") 'deft) ; Ctrl+X,Ctrl+J
+(setq deft-use-filename-as-title t)
 
 (defun rc-grep-todos-in-dir ()
   "Grep recursively for TODO comments in the given directory"
