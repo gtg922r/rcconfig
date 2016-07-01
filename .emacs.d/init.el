@@ -6,6 +6,8 @@
 
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
+(require 'pallet)
+(pallet-mode t)
 
 ;; Get rid of annoying start-up screen
 (setq inhibit-startup-screen t)
@@ -211,6 +213,9 @@
 (global-set-key (kbd "C-x C-k") (lambda()(interactive)(kill-buffer nil)))
 
 ;; Move around buffers all easy like
+;; Ace Window
+(global-set-key (kbd "C-x o") 'ace-window)
+;; Wind Move
 (windmove-default-keybindings)
 (global-set-key (kbd "C-M-l") `windmove-right)
 (global-set-key (kbd "C-M-j") `windmove-left)
@@ -286,7 +291,8 @@ This is used by `global-hl-todo-mode'."
     ("TODO" . "#dc322f")
     ("NEXT" . "#dca3a3")
     ("SQWK" . "#dc8cc3")
-    ("PROG" . "#7cb8bb")
+    ("PROG" . "#bf9f40")
+    ("WIP" . "#bf9f40")
     ("OKAY" . "#7cb8bb")
     ("ELSE" . "#5f7f5f")
     ("WONT" . "#2a7f5f")
@@ -334,12 +340,6 @@ This is used by `global-hl-todo-mode'."
     (hl-todo-mode 1)))
 
 (provide 'hl-todo)
-
-
-;; Local Variables:
-;; indent-tabs-mode: nil
-;; End:
-;;; hl-todo.el ends here
 
 ;; Modes for hl-todo mode
 (add-hook 'emacs-lisp-mode-hook 'hl-todo-mode)
