@@ -8,9 +8,9 @@ import string
 home = os.path.expanduser('~')
 
 if os.path.exists(os.path.join(home, '.emacs/init.el')):
-    print 'init.el already exists'
+    print 'init.el already exists. Aborting'
 elif os.path.exists(os.path.join(home, '.emacs.d')):
-    print '.emacs.d already exists'
+    print '.emacs.d already exists. Aborting'
 else:
     print 'Linking .emacs.d'
     os.symlink(os.path.join(os.getcwd(), '.emacs.d'), os.path.join(home, '.emacs.d'))
