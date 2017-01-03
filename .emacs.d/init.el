@@ -4,6 +4,13 @@
 ;; /_/|_|\___/  \___/\___/_//_/_//_/\_, / 
 ;;                                 /___/ 
 
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
 (require 'pallet)
@@ -217,10 +224,30 @@
 (global-set-key (kbd "C-x o") 'ace-window)
 ;; Wind Move
 (windmove-default-keybindings)
-(global-set-key (kbd "C-M-l") `windmove-right)
-(global-set-key (kbd "C-M-j") `windmove-left)
-(global-set-key (kbd "C-M-i") `windmove-up)
-(global-set-key (kbd "C-M-k") `windmove-down)
+(global-set-key (kbd "M-L") `windmove-right)
+(global-set-key (kbd "M-J") `windmove-left)
+(global-set-key (kbd "M-I") `windmove-up)
+(global-set-key (kbd "M-K") `windmove-down)
+
+;; Insert Date Macro
+
+(defun rc-date-string (&optional prefix)
+  "Insert the current date. With prefix-argument, use ISO format. With
+   two prefix arguments, write out the day and month name."
+  (interactive "P")
+  (let ((format (cond
+                 ((not prefix) "%Y-%m-%d")
+                 ((equal prefix '(4)) "%b %d, %Y")
+                 ((equal prefix '(16)) "%A, %d. %B %Y"))))
+    (format-time-string format)))
+
+(defun insert-date (prefix)
+  "Insert the current date. With prefix-argument, use ISO format. With
+   two prefix arguments, write out the day and month name."
+  (interactive "P")
+  (insert (rc-date-string prefix)))
+
+(global-set-key (kbd "C-c d") 'insert-date)
 
 ;; Deft
 (setq deft-directory "~/Documents/Notes")
@@ -228,7 +255,13 @@
 (setq deft-extension "md")
 (global-set-key (kbd "C-x C-j") 'deft) ; Ctrl+X,Ctrl+J
 (global-set-key (kbd "<f8>") 'deft) ; Ctrl+X,Ctrl+J
-(setq deft-use-filename-as-title t)
+(setq deft-use-filter-string-for-filename t)
+
+(defun rc-prepend-date (string-in)
+  (concat (rc-date-string ()) " " slug))
+
+(setq deft-file-naming-rules '((case-fn . rc-prepend-date)))
+
 
 (defun rc-grep-todos-in-dir ()
   "Grep recursively for TODO comments in the given directory"
@@ -237,19 +270,6 @@
   (enlarge-window 7))
 
 (global-set-key [f5] 'rc-grep-todos-in-dir)
-
-;; Insert Data Macro
-(defun insert-date (prefix)
-  "Insert the current date. With prefix-argument, use ISO format. With
-   two prefix arguments, write out the day and month name."
-  (interactive "P")
-  (let ((format (cond
-                 ((not prefix) "%Y-%m-%d")
-                 ((equal prefix '(4)) "%b %d, %Y")
-                 ((equal prefix '(16)) "%A, %d. %B %Y"))))
-    (insert (format-time-string format))))
-
-(global-set-key (kbd "C-c d") 'insert-date)
 
 ;; Set all auto-saves to happen in central folder
 (setq
@@ -292,6 +312,7 @@ This is used by `global-hl-todo-mode'."
     ("TODO" . "#dc322f")
     ("NEXT" . "#dca3a3")
     ("SQWK" . "#dc8cc3")
+    ("ACTN" . "#dc8cc3")    
     ("PROG" . "#bf9f40")
     ("WIP" . "#bf9f40")
     ("OKAY" . "#7cb8bb")
@@ -394,3 +415,36 @@ This is used by `global-hl-todo-mode'."
                              (frame-char-height)))))))
 
 (set-frame-size-according-to-resolution)
+
+;; TODO/QQQ Inserting and Cycling
+
+(defun rc-action-insert (&optional insert-str)
+  (interactive "*sAction POC:")
+  (concat "@" insert-str))
+
+(defun rc-value-toggle-insert (val1 val2 add-poc)
+  "Cycle between two values in the current line. If neither exists, insert [val1] after white space and bullets. Optionally specifies a string to follow @, e.g. [ACTN@bob]"
+  (move-beginning-of-line nil)
+  (if (re-search-forward (concat val1 "\\|" val2) (line-end-position) t)
+      (replace-match (if (equal (match-string 0) val1) val2 val1))
+    (skip-chars-forward "-*\s\t")
+    (insert (concat "[" val1 (if add-poc (call-interactively `rc-action-insert) "")  "] "))))
+
+(defun rc-cycle-todo ()
+  "Cycle between TODO and DONE. If neither are present insert [TODO] after whitespace and bullets"
+  (interactive)
+  (rc-value-toggle-insert "TODO" "DONE" nil))
+
+(defun rc-cycle-question ()
+  "Cycle between QQQ and AAA. If neither are present insert [QQQ] after whitespace and bullets"
+  (interactive)
+  (rc-value-toggle-insert "QQQ" "AAA" nil))
+
+(defun rc-cycle-action ()
+  (interactive)
+  (rc-value-toggle-insert "ACTN" "DONE" t))
+
+
+(global-set-key (kbd "C-c t") 'rc-cycle-todo)
+(global-set-key (kbd "C-c q") 'rc-cycle-question)
+(global-set-key (kbd "C-c a") 'rc-cycle-action)
