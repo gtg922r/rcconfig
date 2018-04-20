@@ -41,6 +41,11 @@
 ;; Its line numbers all the way down
 (global-linum-mode t)
 
+;; Python Setup
+(setq python-shell-interpreter "ipython"
+      python-shell-interpreter-args "-i")
+(setenv "IPY_TEST_SIMPLE_PROMPT" "1")
+
 ;; Default Font
 (cond
  ((member "Ubuntu Mono" (font-family-list))
@@ -422,7 +427,7 @@ This is used by `global-hl-todo-mode'."
   (interactive "*sAction POC:")
   (concat "@" insert-str))
 
-(defun rc-value-toggle-insert (val1 val2 add-poc)
+(defun rc-value-toggle-insert (val1 val2 &optional add-poc)
   "Cycle between two values in the current line. If neither exists, insert [val1] after white space and bullets. Optionally specifies a string to follow @, e.g. [ACTN@bob]"
   (move-beginning-of-line nil)
   (if (re-search-forward (concat val1 "\\|" val2) (line-end-position) t)
@@ -433,18 +438,104 @@ This is used by `global-hl-todo-mode'."
 (defun rc-cycle-todo ()
   "Cycle between TODO and DONE. If neither are present insert [TODO] after whitespace and bullets"
   (interactive)
-  (rc-value-toggle-insert "TODO" "DONE" nil))
+  (rc-value-toggle-insert "TODO" "DONE"))
+
+(defun rc-cycle-else ()
+  "Cycle between TODO and ELSE. If neither are present insert [ELSE] after whitespace and bullets"
+  (interactive)
+  (rc-value-toggle-insert "ELSE" "TODO"))
+
+(defun rc-cycle-hold ()
+  "Cycle between TODO and HOLD. If neither are present insert [HOLD] after whitespace and bullets"
+  (interactive)
+  (rc-value-toggle-insert "HOLD" "TODO"))
+
+(defun rc-cycle-wont ()
+  "Cycle between TODO and WONT. If neither are present insert [WONT] after whitespace and bullets"
+  (interactive)
+  (rc-value-toggle-insert "WONT" "TODO"))
+
 
 (defun rc-cycle-question ()
   "Cycle between QQQ and AAA. If neither are present insert [QQQ] after whitespace and bullets"
   (interactive)
-  (rc-value-toggle-insert "QQQ" "AAA" nil))
+  (rc-value-toggle-insert "QQQ" "AAA"))
 
 (defun rc-cycle-action ()
   (interactive)
   (rc-value-toggle-insert "ACTN" "DONE" t))
 
 
+(defun rc-get-remaining-line-text ()
+  (interactive)
+  (buffer-substring-no-properties (point) (line-end-position)))
+
+(defun rc-new-things-todo (new-todo-str)
+  "Create a new ToDo in Things3, return the Things to-do id"
+  (interactive)
+  (do-applescript
+   (format "
+     tell application \"Things3\"
+      set newToDo to make new to do with properties {name:\"%s\"} at beginning of list \"Inbox\"
+      get id of newToDo
+     end tell" new-todo-str)))
+
+(defun rc-insert-new-things-todo ()
+  "Creates a new thing todo or switches TODO to thing todo"
+  (interactive)  
+  (move-beginning-of-line nil)
+  (re-search-forward "[-\s]*\\[[^\\[]*\\]" (line-end-position) t)
+  (skip-chars-forward "-*\s\t")
+  (let ((newToDoId (rc-new-things-todo (rc-get-remaining-line-text))))
+    (rc-value-toggle-insert (format "THNGS<%s>" newToDoId) "TODO")))
+
+(global-set-key (kbd "C-c n") 'rc-insert-new-things-todo)
+
+(defun rc-new-things-quickentry (new-todo-str)
+  "Bring up Things3 Quick Entry Panel with name pre-populated"
+  (interactive)
+  (do-applescript
+   (format "
+     tell application \"Things3\"
+      show quick entry panel with properties {name:\"%s\"}
+     end tell" new-todo-str)))
+
+(defun rc-insert-new-things-with-quickentry ()
+  "Creates a new thing todo or switches TODO to thing todo by openning quick entry panel"
+  (interactive)  
+  (move-beginning-of-line nil)
+  (re-search-forward "[-\s]*\\[[^\\[]*\\]" (line-end-position) t)
+  (skip-chars-forward "-*\s\t")
+  (rc-new-things-quickentry (rc-get-remaining-line-text))
+  (rc-value-toggle-insert "THNGS<QUICKENTRY>" "TODO"))
+; TODO: If already exists on the line, then "tell application "Things3" to edit to do id "XXXX-XXXX" (unless its quick edit...
+(global-set-key (kbd "C-c N") 'rc-insert-new-things-with-quickentry)
+
+(defface rc-things-face
+  '((t (:bold t :foreground "#7cb8bb")))
+  "Face used to highlight THNGS keywords.")
+ 
+(defface rc-things-id-face
+  '((t (:bold t :foreground "base01")))
+  "Face used to highlight THNGS keywords.")
+
+(defun rc-things-font-lock ()
+  "Activates Things font-lock"
+  (font-lock-add-keywords nil
+    '(("\\[\\(THNGS\\)\\(<.+>\\)\\]"
+      (1 'rc-things-face prepend)
+      (2 (progn (add-text-properties (match-beginning 2) 
+				     (match-end 2) 
+				     '(invisible dots))) prepend))))
+  (add-to-invisibility-spec '(dots . t)))
+
+(add-hook 'emacs-lisp-mode-hook 'rc-things-font-lock)
+(add-hook 'gfm-mode-hook 'rc-things-font-lock)
+
+
 (global-set-key (kbd "C-c t") 'rc-cycle-todo)
 (global-set-key (kbd "C-c q") 'rc-cycle-question)
 (global-set-key (kbd "C-c a") 'rc-cycle-action)
+(global-set-key (kbd "C-c e") 'rc-cycle-else) 
+(global-set-key (kbd "C-c h") 'rc-cycle-hold)
+(global-set-key (kbd "C-c w") 'rc-cycle-wont)

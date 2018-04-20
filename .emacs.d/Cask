@@ -12,3 +12,5 @@
 (depends-on "powerline")
 (depends-on "rainbow-mode")
 (depends-on "solarized-theme")
+(depends-on "ssh")
+(depends-on "yaml-mode")
