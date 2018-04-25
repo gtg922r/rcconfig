@@ -5,6 +5,7 @@
 ;;                                 /___/ 
 
 
+
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
@@ -210,11 +211,12 @@
 (add-to-list 'auto-mode-alist '("\\Podfile\\'"  . ruby-mode))
 
 ;; Modes for rainbow mode
-(defun rainbow-activate ()
-  (rainbow-mode 1))
-(add-hook 'emacs-lisp-mode-hook 'rainbow-activate)
-(add-hook 'css-mode-hook 'rainbow-activate)
-(add-hook 'html-mode-hook 'rainbow-activate)
+;; Difficulty downloading from elpa
+;; (defun rainbow-activate ()
+;;   (rainbow-mode 1))
+;; (add-hook 'emacs-lisp-mode-hook 'rainbow-activate)
+;; (add-hook 'css-mode-hook 'rainbow-activate)
+;; (add-hook 'html-mode-hook 'rainbow-activate)
 
 
 ;; MATLAB files

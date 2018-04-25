@@ -5,7 +5,6 @@
 (depends-on "cask")
 (depends-on "dash")
 (depends-on "deft")
-(depends-on "dos")
 (depends-on "epl")
 (depends-on "markdown-mode")
 (depends-on "pallet")

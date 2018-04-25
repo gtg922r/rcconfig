@@ -5,43 +5,56 @@ echo "RCConfig - Auto Setup"
 # Create / Connect Google Drive- ln -s ~/Google\ Drive/Notes ~/Documents/w
 
 echo "Linking dot files:"
-ln -s ./.bash_profile ~/
+ln -s ~/.rcconfig/.bash_profile ~/
 echo "Linked .bash_profile"
-ln -s ./.bashrc ~/
+ln -s ~/.rcconfig/.bashrc ~/
 echo "Linked .bashrc"
+
+echo "Installing XCode Tools..."
+xcode-select --install
 
 echo "Installing Homebrew..."
 #ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 cd ~
 mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
+cd .rcconfig
 
 echo "Installing Homebrew Cask"
-brew install caskroom/cask/brew-cask
+#brew install caskroom/cask/brew-cask
+brew tap caskroom/cask
 
-echo "Install emacs cli"
-brew install emacs --with-cocoa
+echo "Install emacs gui"
+brew cask install emacs
+echo "Install emacs cli" #mainly just keeps brew happy
+brew install emacs --with-gnutls --with-cocoa
+echo "Install iterm2"
+brew cask install iterm2
+
 # brew linkapps emacs
-mv /usr/local/opt/emacs/Emacs.app /Applications
+# mv /usr/local/opt/emacs/Emacs.app /Applications
 
 echo "Emacs Setup..."
 python install_emacs.py
 brew tap caskroom/fonts
 brew cask install font-anonymous-pro
+
+echo "Installing Google Drive"
+brew cask install google-drive-file-stream
+echo "Google Drive Installed. Save notes for offline and link to Documents notes"
+echo "ln -s /Volumes/GoogleDrive/My\ Drive/Notes ~/Documents/Notes"
 #export PATH="/Users/ryan/.cask/bin:$PATH" ?
 
 # May want to config terminal but storing profile and loading it:
 ## > ~/Library/Preferences/com.apple.Terminal.plist
 
 echo "Installing Brew Cask Apps"
+
 brew cask install spotify
 brew cask install skype
-brew cask install things
 brew cask install vlc
 
-echo "Don't forget to link to Notes"
-echo "Get Drive and then ln -s /Users/ryancash/Google Drive/Notes ~/Documents/Notes"
 
-
+echo "Install Things from App Store"
 
 # echo "Installing for Work is limited to Spotify, Skype, and VLC..."
 # read -n 1 -p "Install for (W)ork or (H)ome? " wh
