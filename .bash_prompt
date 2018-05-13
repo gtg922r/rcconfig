@@ -1,0 +1,55 @@
+##### COLORS #####
+SETFG="\e[38;5;"
+SETBG="\e[48;5;"
+
+BLACK="0m"
+RED="1m"
+GREEN="2m"
+YELLOW="3m"
+BLUE="4m"
+MAGENTA="5m"
+CYAN="6m"
+WHITE="7m"
+
+bBLACK="8m"
+bRED="9m"
+bGREEN="10m"
+bYELLOW="11m"
+bBLUE="12m"
+bMAGENTA="13m"
+bCYAN="14m"
+bWHITE="15m"
+
+CLEAR="\e[0m"
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    OSGLYPH="\[${SETFG}${bGREEN}${SETBG}${BLACK}\]\A rpi \[${SETFG}${MAGENTA}\] \[${CLEAR}${SETFG}${BLACK}${SETBG}${bGREEN}\]\[${CLEAR}\]"
+    TITLEBAR="\[\e]2;(rpi) \w\a\]"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    OSGLYPH="\[${SETFG}${bGREEN}${SETBG}${BLACK}\]\A mac \[${SETFG}${BLUE}\] \[${CLEAR}${SETFG}${BLACK}${SETBG}${bGREEN}\]\[${CLEAR}\]"
+    TITLEBAR="\[\e]2;(mac) \w\a\]"
+else
+    OSGLYPH="\[${SETFG}${bGREEN}${SETBG}${BLACK}\]\A n/a \[${SETFG}${RED}\] \[${CLEAR}${SETFG}${BLACK}${SETBG}${bGREEN}\]\[${CLEAR}\]"
+    TITLEBAR="\[\e]2;(unknown1) \w\a\]"
+fi
+
+
+sUSER="\[${SETFG}${BLACK}${SETBG}${bYELLOW}\] \u@\h \[${SETFG}${bYELLOW}${SETBG}${bGREEN}\]"
+sDIR="\[${SETFG}${bWHITE}${SETBG}${bGREEN}\] \w\[${CLEAR}${SETFG}${bGREEN}${SETBG}${BLACK}\]"
+
+sTIME="\[${SETFG}${bCYAN}\]\[${SETFG}${BLACK}${SETBG}${bCYAN}\] \d \t\[${CLEAR}\["
+RIGHTTIME="\[$(printf " %.0s" $(seq 22 $(tput cols)))${sTIME}\r"
+
+## Multi-line command prompt with user, host, path, date and time, and current OS
+#PS1="${RIGHTTIME}┏${sUSER}${sDIR}\[${CLEAR}\]\n┗ ${OSGLYPH}\[${SETFG}${WHITE}\] \$\[${CLEAR}\]  ${TITLEBAR}"
+
+## Simple, concise command prompt and titlebar set
+PS1="${OSGLYPH}${sDIR}\[${SETFG}${WHITE}\] \$\[${CLEAR}\] ${TITLEBAR}"
+
+
+# Powerline glyphs: https://apw-bash-settings.readthedocs.io/en/latest/fontpatching.html
+# Nerd fonts: https://github.com/ryanoasis/nerd-fonts (need to patch my own)
+# Escape sequences: http://tldp.org/HOWTO/Bash-Prompt-HOWTO/bash-prompt-escape-sequences.html
+# Generator: http://bashrcgenerator.com/#minidoc
+
+

@@ -10,6 +10,11 @@ echo "Linked .bash_profile"
 ln -s ~/.rcconfig/.bashrc ~/
 echo "Linked .bashrc"
 
+
+mkdir ~/Library/Keybindings
+ln -s ~/.rcconfig/DefaultKeyBinding.dict ~/Library/Keybindings/
+echo "Linked DefaultKeyBindings"
+
 echo "Installing XCode Tools..."
 xcode-select --install
 
@@ -34,9 +39,9 @@ brew cask install iterm2
 # mv /usr/local/opt/emacs/Emacs.app /Applications
 
 echo "Emacs Setup..."
-python install_emacs.py
 brew tap caskroom/fonts
 brew cask install font-anonymous-pro
+python install_emacs.py
 
 echo "Installing Google Drive"
 brew cask install google-drive-file-stream
@@ -48,13 +53,9 @@ echo "ln -s /Volumes/GoogleDrive/My\ Drive/Notes ~/Documents/Notes"
 ## > ~/Library/Preferences/com.apple.Terminal.plist
 
 echo "Installing Brew Cask Apps"
-
 brew cask install spotify
 brew cask install skype
 brew cask install vlc
-
-
-echo "Install Things from App Store"
 
 # echo "Installing for Work is limited to Spotify, Skype, and VLC..."
 # read -n 1 -p "Install for (W)ork or (H)ome? " wh
