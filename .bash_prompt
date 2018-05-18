@@ -22,14 +22,33 @@ bWHITE="15m"
 
 CLEAR="\e[0m"
 
+
+function virtualenv_info(){
+    # Get Virtual Env
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        # Strip out the path and just leave the env name
+        venv="(venv)"
+    else
+        # In case you don't have one activated
+        venv=''
+    fi
+    [[ -n "$venv" ]] && echo "$venv"
+}
+
+# disable the default virtualenv prompt change
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+
+VENV="\$(virtualenv_info)";
+# the '...' are for irrelevant info here.
+
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    OSGLYPH="\[${SETFG}${bGREEN}${SETBG}${BLACK}\]\A rpi \[${SETFG}${MAGENTA}\] \[${CLEAR}${SETFG}${BLACK}${SETBG}${bGREEN}\]\[${CLEAR}\]"
+    OSGLYPH="\[${SETFG}${bGREEN}${SETBG}${BLACK}\]\A rpi \[${SETFG}${MAGENTA}\] ${VENV}\[${CLEAR}${SETFG}${BLACK}${SETBG}${bGREEN}\]\[${CLEAR}\]"
     TITLEBAR="\[\e]2;(rpi) \w\a\]"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    OSGLYPH="\[${SETFG}${bGREEN}${SETBG}${BLACK}\]\A mac \[${SETFG}${BLUE}\] \[${CLEAR}${SETFG}${BLACK}${SETBG}${bGREEN}\]\[${CLEAR}\]"
+    OSGLYPH="\[${SETFG}${bGREEN}${SETBG}${BLACK}\]\A mac \[${SETFG}${BLUE}\] ${VENV}\[${CLEAR}${SETFG}${BLACK}${SETBG}${bGREEN}\]\[${CLEAR}\]"
     TITLEBAR="\[\e]2;(mac) \w\a\]"
 else
-    OSGLYPH="\[${SETFG}${bGREEN}${SETBG}${BLACK}\]\A n/a \[${SETFG}${RED}\] \[${CLEAR}${SETFG}${BLACK}${SETBG}${bGREEN}\]\[${CLEAR}\]"
+    OSGLYPH="\[${SETFG}${bGREEN}${SETBG}${BLACK}\]\A n/a \[${SETFG}${RED}\] ${VENV}\[${CLEAR}${SETFG}${BLACK}${SETBG}${bGREEN}\]\[${CLEAR}\]"
     TITLEBAR="\[\e]2;(unknown1) \w\a\]"
 fi
 
