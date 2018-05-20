@@ -63,7 +63,20 @@ RIGHTTIME="\[$(printf " %.0s" $(seq 22 $(tput cols)))${sTIME}\r"
 #PS1="${RIGHTTIME}┏${sUSER}${sDIR}\[${CLEAR}\]\n┗ ${OSGLYPH}\[${SETFG}${WHITE}\] \$\[${CLEAR}\]  ${TITLEBAR}"
 
 ## Simple, concise command prompt and titlebar set
-PS1="${OSGLYPH}${sDIR}\[${SETFG}${WHITE}\] \$\[${CLEAR}\] ${TITLEBAR}"
+RC_PS1="${OSGLYPH}${sDIR}\[${SETFG}${WHITE}\] \$\[${CLEAR}\] ${TITLEBAR}"
+
+## Only change PS1 if we have a human terminal. Give simple prompt for emacs tramp
+case "$TERM" in
+    "dumb")
+	PS1="> "
+	;;
+    xterm*|rxvt*|eterm*|screen*)
+	PS1=$RC_PS1
+	;;
+    *)
+	PS1="> "
+	;;
+esac
 
 
 # Powerline glyphs: https://apw-bash-settings.readthedocs.io/en/latest/fontpatching.html
