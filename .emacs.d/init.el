@@ -12,7 +12,9 @@
 ;; You may delete these explanatory comments.
 (package-initialize)
 
-(require 'cask "~/.cask/cask.el")
+;; (require 'cask "~/.emacs.d/.cask/cask.el") ;; If installed via curl and python install script
+(require 'cask "~/homebrew/share/emacs/site-lisp/cask/cask.el") ;; If installed via brew
+
 (cask-initialize)
 (require 'pallet)
 (pallet-mode t)
@@ -24,9 +26,53 @@
 (set-register ?e (cons 'file "~/.emacs.d/init.el"))
 (set-register ?c (cons 'file "~/.emacs.d/Cask"))
 
-;; Load Theme
-(load-theme 'solarized-dark t)
-(setq solarized-high-contrast-mode-line t)
+
+;; Load Theme (this is for solarized-theme)
+;; (load-theme 'solarized-dark t)
+;; (setq solarized-high-contrast-mode-line t)
+
+;; Load Theme (this if for color-theme-solarized)
+(customize-set-variable 'frame-background-mode 'dark)
+
+;; (defvar solarized-colors           ; ANSI(Solarized terminal)
+;;   ;; name     sRGB      Gen RGB   256       16              8
+;;   '((base03  "#000000" "#728a05" "#1c1c1c" "brightblack"   "black")
+;;     (base02  "#222222" "#728a05" "#262626" "black"         "black")
+;;     (base01  "#444444" "#728a05" "#585858" "brightgreen"   "green")
+;;     (base00  "#555555" "#728a05" "#626262" "brightyellow"  "yellow")
+;;     (base0   "#888888" "#728a05" "#808080" "brightblue"    "blue")
+;;     (base1   "#aaaaaa" "#81908f" "#8a8a8a" "brightcyan"    "cyan")
+;;     (base2   "#fafafa" "#e9e2cb" "#e4e4e4" "white"         "white")
+;;     (base3   "#ffffff" "#fcf4dc" "#ffffd7" "brightwhite"   "white")
+;;     (yellow  "#b58900" "#a57705" "#af8700" "yellow"        "yellow")
+;;     (orange  "#cb4b16" "#bd3612" "#d75f00" "brightred"     "red")
+;;     (red     "#dc322f" "#c60007" "#d70000" "red"           "red")
+;;     (magenta "#d33682" "#c61b6e" "#af005f" "magenta"       "magenta")
+;;     (violet  "#6c71c4" "#5859b7" "#5f5faf" "brightmagenta" "magenta")
+;;     (blue    "#268bd2" "#2075c7" "#0087ff" "blue"          "blue")
+;;     (cyan    "#2aa198" "#259185" "#00afaf" "cyan"          "cyan")
+;;     (green   "#859900" "#728a05" "#5f8700" "green"         "green"))
+;;   "This is a table of all the colors used by the Solarized color theme. Each
+;;    column is a different set, one of which will be chosen based on term
+;;    capabilities, etc.")
+;; 
+
+(load-theme 'solarized t)
+
+
+
+;; If in a terminal, use terminal bg colors
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+
+
+;; Fix seperator colors
+(setq ns-use-srgb-colorspace nil)
 
 ;; Load Powerline
 (powerline-default-theme)
@@ -49,13 +95,17 @@
 
 ;; Default Font
 (cond
- ((member "Ubuntu Mono" (font-family-list))
-  (set-default-font "Ubuntu Mono 10")
-  (add-to-list 'default-frame-alist '(font . "Ubuntu Mono 10"  ))
+ ((member "Anonymous Pro for Powerline" (font-family-list))
+  (set-default-font "Anonymous Pro for Powerline 11")
+  (add-to-list 'default-frame-alist '(font . "Anonymous Pro for Powerline 11"  ))
   )
  ((member "Anonymous Pro" (font-family-list))
   (set-default-font "Anonymous Pro 10")
   (add-to-list 'default-frame-alist '(font . "Anonymous Pro 11"  ))
+  )
+ ((member "Ubuntu Mono" (font-family-list))
+  (set-default-font "Ubuntu Mono 10")
+  (add-to-list 'default-frame-alist '(font . "Ubuntu Mono 10"  ))
   )
  ((member "Monaco" (font-family-list))
   (set-default-font "Monaco 10")
@@ -116,6 +166,11 @@
 ;; Turn on iimage in markdown-mode
 (add-hook 'markdown-mode-hook 'turn-on-iimage-mode)
 (add-hook 'gfm-mode-hook      'turn-on-iimage-mode)
+
+;; Turn visual line mode iimage in markdown-mode
+(add-hook 'markdown-mode-hook 'visual-line-mode)
+(add-hook 'gfm-mode-hook      'visual-line-mode)
+
 
 ;; Toggle iimage with C-c i
 (add-hook 'gfm-mode-hook      (lambda()(local-set-key (kbd "C-c i") 'iimage-mode)))
@@ -211,12 +266,11 @@
 (add-to-list 'auto-mode-alist '("\\Podfile\\'"  . ruby-mode))
 
 ;; Modes for rainbow mode
-;; Difficulty downloading from elpa
-;; (defun rainbow-activate ()
-;;   (rainbow-mode 1))
-;; (add-hook 'emacs-lisp-mode-hook 'rainbow-activate)
-;; (add-hook 'css-mode-hook 'rainbow-activate)
-;; (add-hook 'html-mode-hook 'rainbow-activate)
+(defun rainbow-activate ()
+   (rainbow-mode 1))
+(add-hook 'emacs-lisp-mode-hook 'rainbow-activate)
+(add-hook 'css-mode-hook 'rainbow-activate)
+(add-hook 'html-mode-hook 'rainbow-activate)
 
 
 ;; MATLAB files
