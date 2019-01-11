@@ -19,15 +19,15 @@ echo "Installing XCode Tools..."
 xcode-select --install
 
 echo "Installing Homebrew..."
-#ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-cd ~
-mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+#cd ~
+#mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
 cd .rcconfig
 
 echo "Installing Homebrew Cask"
 #brew install caskroom/cask/brew-cask
 brew tap caskroom/cask
-
+#try to link to iterm plist first
 echo "Install emacs gui"
 brew cask install emacs
 echo "Install emacs cli" #mainly just keeps brew happy
@@ -56,6 +56,7 @@ echo "Installing Brew Cask Apps"
 brew cask install spotify
 brew cask install skype
 brew cask install vlc
+brew cask install qlmarkdown
 
 # echo "Installing for Work is limited to Spotify, Skype, and VLC..."
 # read -n 1 -p "Install for (W)ork or (H)ome? " wh

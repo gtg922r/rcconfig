@@ -1,5 +1,6 @@
 {
+    /* Additional Options at https://gist.github.com/cheapRoc/9670905*/
     "~d" = "deleteWordForward:";
-    ~f" = "moveWordForward:";
+    "~f" = "moveWordForward:";
     "~b" = "moveWordBackward:";
 }

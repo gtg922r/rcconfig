@@ -17,7 +17,7 @@ export EDITOR="emacs"
 export PATH=$HOME/.cask/bin:$PATH
 export PATH=$HOME/homebrew/bin:$PATH
 
-# Pyenv Setup (https://github.com/pyenv/)
+# Pyenv Setup (https://github.com/pyenv/) if installed
 if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init -)"
 fi

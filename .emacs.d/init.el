@@ -1,39 +1,67 @@
-;    ___  _____  _____          ____     
+;;    ___  _____  _____          ____     
 ;;   / _ \/ ___/ / ___/__  ___  / _(_)__ _
 ;;  / , _/ /__  / /__/ _ \/ _ \/ _/ / _ `/
 ;; /_/|_|\___/  \___/\___/_//_/_//_/\_, / 
 ;;                                 /___/ 
 
-
-
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
-(package-initialize)
-
-;; (require 'cask "~/.emacs.d/.cask/cask.el") ;; If installed via curl and python install script
-(require 'cask "~/homebrew/share/emacs/site-lisp/cask/cask.el") ;; If installed via brew
-
-(cask-initialize)
-(require 'pallet)
-(pallet-mode t)
-
-;; Get rid of annoying start-up screen
-(setq inhibit-startup-screen t)
-
 ;; Set registers to common files (do it now, before things that may fail)
 (set-register ?e (cons 'file "~/.emacs.d/init.el"))
 (set-register ?c (cons 'file "~/.emacs.d/Cask"))
+(set-register ?r (cons 'file "~/.bashrc"))
+(set-register ?p (cons 'file "~/.bash_profile"))
 
+;; Initialize Cask (installed via homebrew) and Pallet
+(require 'cask "/usr/local/share/emacs/site-lisp/cask/cask.el")
+(cask-initialize)
+(pallet-mode t)
 
-;; Load Theme (this is for solarized-theme)
-;; (load-theme 'solarized-dark t)
-;; (setq solarized-high-contrast-mode-line t)
+;; Use MELPA when using package-
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/") t)
 
-;; Load Theme (this if for color-theme-solarized)
-(customize-set-variable 'frame-background-mode 'dark)
+;; Configure Packages
 
+(use-package treemacs
+  :defer t
+  :config
+  (progn
+    (setq treemacs-display-in-side-window     nil
+          treemacs-is-never-other-window      nil
+          treemacs-no-delete-other-windows    nil
+          treemacs-width                      30)
+
+    (treemacs-resize-icons 15)
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode t)))
+
+;; General emacs Settigs and cleanup
+(use-package emacs
+  :config
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq initial-scratch-message "")
+  (setq inhibit-startup-message t)
+  :hook
+  (prog-mode . display-line-numbers-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Configure Visuals ;;;;;;;;;;;;;
+
+;; Load and Configure Theme
+(use-package color-theme-solarized
+  :init
+  (customize-set-variable 'frame-background-mode 'dark)
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+  (add-to-list 'default-frame-alist '(ns-appearance . dark)) ;; assuming you are using a dark theme
+  (setq ns-use-proxy-icon nil)
+  (setq frame-title-format nil)
+
+  :config
+  (load-theme 'solarized t)
+  (custom-theme-set-faces 'solarized '(fringe ((nil)))))
+
+;; Solarized Colors for reference
 ;; (defvar solarized-colors           ; ANSI(Solarized terminal)
 ;;   ;; name     sRGB      Gen RGB   256       16              8
 ;;   '((base03  "#000000" "#728a05" "#1c1c1c" "brightblack"   "black")
@@ -55,60 +83,127 @@
 ;;   "This is a table of all the colors used by the Solarized color theme. Each
 ;;    column is a different set, one of which will be chosen based on term
 ;;    capabilities, etc.")
-;; 
 
-(load-theme 'solarized t)
+(use-package powerline
+  :config
+  (powerline-default-theme)
+  (setq powerline-image-apple-rgb t))
+
+(use-package rainbow-mode
+  :delight
+  :hook ((emacs-lisp-mode web-mode css-mode) . rainbow-mode))
+
+;; Highlight lines that are longer than 80 in prog-mode
+(use-package whitespace
+  :defer t
+  :delight
+  :config
+  (setq-default
+   whitespace-line-column 80
+   whitespace-style       '(face lines-tail))
+  :hook
+  (prog-mode . whitespace-mode))
 
 
+(use-package hide-mode-line
+  :hook
+  (markdown-mode . hide-mode-line-mode))
 
-;; If in a terminal, use terminal bg colors
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Configure Interface ;;;;;;;;;;;
+(global-set-key "\C-x\C-m" 'execute-extended-command)
+
+(use-package avy
+  :bind (
+	 ("C-;" . avy-goto-word-or-subword-1)
+	 ("M-g M-g" . avy-goto-line)
+	 ("M-g g" . avy-goto-line))
+  :config
+  (setq avy-background 1))
 
 
+(setenv "DICPATH" (concat (getenv "HOME") "/Library/Spelling"))
+(setq ispell-program-name "/usr/local/bin/hunspell")
+(setq ispell-really-hunspell t)
 
-;; Fix seperator colors
-(setq ns-use-srgb-colorspace nil)
+(use-package flyspell
+  :init
+  (setenv "DICPATH" (concat (getenv "HOME") "/Library/Spelling"))
+  (setq ispell-program-name "/usr/local/bin/hunspell")
+  (setq ispell-really-hunspell t))
 
-;; Load Powerline
-(powerline-default-theme)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Additional Configuration
+;; TODO: Migrate most of this to use-package
+
+
 
 ;; Set Environment Path
 (setenv "PATH" (concat (getenv "PATH") ":~/homebrew/bin:/usr/local/bin:/usr/texbin:/opt/local/bin"))
 (setq exec-path (append exec-path '("~/homebrew/bin" "/usr/local/bin" "/usr/texbin" "/opt/local/bin")))
 
-;; Clean up windows
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-
 ;; Its line numbers all the way down
-(global-linum-mode t)
+;; (global-linum-mode t)
 
 ;; Python Setup
-(setq python-shell-interpreter "ipython"
-      python-shell-interpreter-args "-i")
-(setenv "IPY_TEST_SIMPLE_PROMPT" "1")
+; (setq python-shell-interpreter "ipython"
+;       python-shell-interpreter-args "-i")
+; (setenv "IPY_TEST_SIMPLE_PROMPT" "1")
+(setq elpy-rpc-python-command "python3")
+(setenv "WORKON_HOME" "~/.venvs")
+(setq python-shell-interpreter "jupyter"
+      python-shell-interpreter-args "console --simple-prompt"
+      python-shell-prompt-detect-failure-warning nil)
+(elpy-enable)
+(add-to-list 'python-shell-completion-native-disabled-interpreters
+             "jupyter")
+
+;; Maximize window and then undo
+(defun toggle-maximize-buffer () "Maximize buffer"
+  (interactive)
+  (if (= 1 (length (window-list)))
+      (jump-to-register '_) 
+    (progn
+      (window-configuration-to-register '_)
+      (delete-other-windows))))
+(global-set-key (kbd "C-x f") `toggle-maximize-buffer)
+
+;; Configure window-purpose for IDE
+(purpose-mode 1)
+(add-to-list 'purpose-user-mode-purposes '(python-mode . code))
+(add-to-list 'purpose-user-mode-purposes '(emacs-lisp-mode . code))
+(add-to-list 'purpose-user-mode-purposes '(prog-mode . code))
+(add-to-list 'purpose-user-mode-purposes '(inferior-python-mode . repl))
+(add-to-list 'purpose-user-mode-purposes '(shell-mode . shell))
+(add-to-list 'purpose-user-mode-purposes '(neotree-mode . filetree))
+(add-to-list 'purpose-user-mode-purposes '(treemacs-mode . filetree))
+(add-to-list 'purpose-user-mode-purposes '(dired-mode . filetree))
+(add-to-list 'purpose-user-mode-purposes '(imenu-list-major-mode . symboltree))
+(purpose-compile-user-configuration)
+
+
+
+;; Enable Ivy (autocompletion for emacs interface (find file, switch buffer, etc)
+(ivy-mode 1)
+(setq ivy-count-format "%d/%d ")
+(global-set-key "\C-s" 'swiper)
+
 
 ;; Default Font
 (cond
  ((member "Anonymous Pro for Powerline" (font-family-list))
-  (set-default-font "Anonymous Pro for Powerline 11")
   (add-to-list 'default-frame-alist '(font . "Anonymous Pro for Powerline 11"  ))
   )
+ ((member "Anonymice Nerd Font" (font-family-list))
+  (add-to-list 'default-frame-alist '(font . "Anonymice Nerd Font 11" ))
+  )
  ((member "Anonymous Pro" (font-family-list))
-  (set-default-font "Anonymous Pro 10")
   (add-to-list 'default-frame-alist '(font . "Anonymous Pro 11"  ))
   )
  ((member "Ubuntu Mono" (font-family-list))
-  (set-default-font "Ubuntu Mono 10")
   (add-to-list 'default-frame-alist '(font . "Ubuntu Mono 10"  ))
   )
  ((member "Monaco" (font-family-list))
-  (set-default-font "Monaco 10")
   (add-to-list 'default-frame-alist '(font . "Monaco 11"  ))
   )
  )
@@ -265,15 +360,7 @@
 (add-to-list 'auto-mode-alist '("\\.podspec\\'" . ruby-mode))
 (add-to-list 'auto-mode-alist '("\\Podfile\\'"  . ruby-mode))
 
-;; Modes for rainbow mode
-(defun rainbow-activate ()
-   (rainbow-mode 1))
-(add-hook 'emacs-lisp-mode-hook 'rainbow-activate)
-(add-hook 'css-mode-hook 'rainbow-activate)
-(add-hook 'html-mode-hook 'rainbow-activate)
-
-
-;; MATLAB files
+;; Matlab files
 ;; Instead, just use OCTAVE mode
 (add-to-list 'auto-mode-alist '("\\.m\\'" . octave-mode))
 
@@ -283,6 +370,9 @@
 ;; Move around buffers all easy like
 ;; Ace Window
 (global-set-key (kbd "C-x o") 'ace-window)
+(setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+(setq aw-scope `frame)
+
 ;; Wind Move
 (windmove-default-keybindings)
 (global-set-key (kbd "M-L") `windmove-right)
