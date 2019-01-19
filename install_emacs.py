@@ -16,6 +16,7 @@ else:
     os.symlink(os.path.join(os.getcwd(), '.emacs.d'),
                os.path.join(home, '.emacs.d'))
     print('Installing cask...')
+    # should be brew install cask --ignore-dependencies if using emacs-plus
     os.system('brew install cask')
     os.chdir(os.path.join(os.getcwd(), '.emacs.d'))
     print('Installing packages from cask file...'
