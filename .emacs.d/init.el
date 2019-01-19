@@ -158,6 +158,10 @@
 (add-to-list 'python-shell-completion-native-disabled-interpreters
              "jupyter")
 
+;; (use-package ein
+;;   :config
+;;   (setq ein:completion-backend 'ein:use-company-backend))
+
 ;; Maximize window and then undo
 (defun toggle-maximize-buffer () "Maximize buffer"
   (interactive)
@@ -171,6 +175,7 @@
 ;; Configure window-purpose for IDE
 (purpose-mode 1)
 (add-to-list 'purpose-user-mode-purposes '(python-mode . code))
+(add-to-list 'purpose-user-mode-purposes '(ein . code))
 (add-to-list 'purpose-user-mode-purposes '(emacs-lisp-mode . code))
 (add-to-list 'purpose-user-mode-purposes '(prog-mode . code))
 (add-to-list 'purpose-user-mode-purposes '(inferior-python-mode . repl))
