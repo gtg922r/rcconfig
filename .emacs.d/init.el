@@ -20,7 +20,6 @@
              '("melpa" . "https://melpa.org/packages/") t)
 
 ;; Configure Packages
-
 (use-package treemacs
   :defer t
   :config
@@ -133,6 +132,59 @@
   (setq ispell-program-name "/usr/local/bin/hunspell")
   (setq ispell-really-hunspell t))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Programming Configuration
+(use-package flycheck
+  :init (global-flycheck-mode))
+
+(use-package yapfify
+  :hook
+  (python-mode . yapf-mode))
+
+(use-package python
+  :config
+  (setq python-shell-interpreter "python"))
+
+(use-package anaconda
+  :custom
+  (anaconda-mode-lighter " PyA")
+  :hook
+  (python-mode . anaconda-mode))
+
+(use-package company
+  :init
+  (global-company-mode)
+  :custom
+  (company-idle-delay 0.2)
+  (company-tooltip-idle-delay 0.2)
+  (company-frontends `(company-pseudo-tooltip-frontend
+		       company-echo-metadata-frontend
+		       company-preview-frontend))
+  :delight
+  :config
+  ;; Use Company for completion
+  (bind-key [remap completion-at-point] #'company-complete company-mode-map)
+  (define-key
+    company-active-map (kbd "TAB") 'company-complete-common-or-cycle)
+  (define-key
+    company-active-map (kbd "<tab>") 'company-complete-common-or-cycle))
+
+
+(require 'rx)
+; TODO move this inside use package
+(use-package company-anaconda
+;  :defer t
+  :after company
+;  :init (add-to-list 'company-backends #'company-anaconda :with company-capf))
+  :init (add-to-list 'company-backends '(company-anaconda :with company-capf)))
+
+(use-package company-quickhelp
+  :after company
+  :custom
+  (company-quickhelp-delay 0.7)
+  (company-quickhelp-max-lines 30)
+  :hook ((company-mode . company-quickhelp-mode)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Additional Configuration
 ;; TODO: Migrate most of this to use-package
@@ -146,22 +198,8 @@
 ;; Its line numbers all the way down
 ;; (global-linum-mode t)
 
-;; Python Setup
-; (setq python-shell-interpreter "ipython"
-;       python-shell-interpreter-args "-i")
-; (setenv "IPY_TEST_SIMPLE_PROMPT" "1")
-(setq elpy-rpc-python-command "python3")
-(setenv "WORKON_HOME" "~/.venvs")
-(setq python-shell-interpreter "jupyter"
-      python-shell-interpreter-args "console --simple-prompt"
-      python-shell-prompt-detect-failure-warning nil)
-(elpy-enable)
-(add-to-list 'python-shell-completion-native-disabled-interpreters
-             "jupyter")
+ 
 
-;; (use-package ein
-;;   :config
-;;   (setq ein:completion-backend 'ein:use-company-backend))
 
 ;; Maximize window and then undo
 (defun toggle-maximize-buffer () "Maximize buffer"
