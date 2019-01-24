@@ -42,6 +42,7 @@
   (setq initial-scratch-message "")
   (setq inhibit-startup-message t)
   :hook
+  (prog-mode . show-paren-mode)
   (prog-mode . display-line-numbers-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -134,6 +135,10 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Programming Configuration
+(use-package python
+  :config
+  (setq python-shell-interpreter "python"))
+
 (use-package flycheck
   :init (global-flycheck-mode))
 
@@ -141,9 +146,14 @@
   :hook
   (python-mode . yapf-mode))
 
-(use-package python
-  :config
-  (setq python-shell-interpreter "python"))
+(use-package python-cell
+  :hook
+  (python-mode . python-cell-mode)
+  :custom
+;  (python-cell-
+  :bind (
+	 ("M-p" . python-backward-cell)
+	 ("M-n" . python-forward-cell))) 
 
 (use-package anaconda
   :custom
