@@ -1,4 +1,4 @@
-;;    ___  _____  _____          ____     
+;;;   ___  _____  _____          ____     
 ;;   / _ \/ ___/ / ___/__  ___  / _(_)__ _
 ;;  / , _/ /__  / /__/ _ \/ _ \/ _/ / _ `/
 ;; /_/|_|\___/  \___/\___/_//_/_//_/\_, / 
@@ -149,17 +149,19 @@
 (use-package python-cell
   :hook
   (python-mode . python-cell-mode)
-  :custom
-;  (python-cell-
   :bind (
 	 ("M-p" . python-backward-cell)
 	 ("M-n" . python-forward-cell))) 
 
+;; (use-package helm-pydoc
+
 (use-package anaconda
-  :custom
-  (anaconda-mode-lighter " PyA")
   :hook
-  (python-mode . anaconda-mode))
+  (python-mode . anaconda-mode)
+  :bind ([remap anaconda-mode-show-doc] . pydoc-at-point)
+  :custom
+  (anaconda-mode-lighter " PyA"))
+
 
 (use-package company
   :init
@@ -227,6 +229,7 @@
 (add-to-list 'purpose-user-mode-purposes '(ein . code))
 (add-to-list 'purpose-user-mode-purposes '(emacs-lisp-mode . code))
 (add-to-list 'purpose-user-mode-purposes '(prog-mode . code))
+(add-to-list 'purpose-user-mode-purposes '(pydoc-mode . doc))
 (add-to-list 'purpose-user-mode-purposes '(inferior-python-mode . repl))
 (add-to-list 'purpose-user-mode-purposes '(shell-mode . shell))
 (add-to-list 'purpose-user-mode-purposes '(neotree-mode . filetree))
@@ -739,3 +742,18 @@ This is used by `global-hl-todo-mode'."
 (global-set-key (kbd "C-c e") 'rc-cycle-else) 
 (global-set-key (kbd "C-c h") 'rc-cycle-hold)
 (global-set-key (kbd "C-c w") 'rc-cycle-wont)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(frame-background-mode (quote dark))
+ '(package-selected-packages
+   (quote
+    (helm-pydoc helm yapfify yaml-mode window-purpose use-package try treemacs swiper ssh rainbow-mode python-cell pydoc powerline pipenv pallet neotree markdown-mode magit hide-mode-line flycheck elpy ein delight deft company-quickhelp company-anaconda color-theme-solarized))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
