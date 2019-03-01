@@ -41,8 +41,18 @@
   (scroll-bar-mode -1)
   (setq initial-scratch-message "")
   (setq inhibit-startup-message t)
+  (global-set-key [M-s-drag-n-drop] 'ns-drag-n-drop-as-text)
+  (bind-keys*
+   ("C-;" . (prog-mode . display-line-numbers-mode))
+   ("C-j" . jump-to-register))
   :hook
   (prog-mode . display-line-numbers-mode))
+
+(use-package grab-mac-link
+  :bind (("C-c g" . grab-mac-link)  ))
+  
+  
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configure Visuals ;;;;;;;;;;;;;
@@ -58,19 +68,20 @@
 
   :config
   (load-theme 'solarized t)
+  (set-face-attribute 'outline-4 nil :foreground "#d33682")
   (custom-theme-set-faces 'solarized '(fringe ((nil)))))
 
 ;; Solarized Colors for reference
 ;; (defvar solarized-colors           ; ANSI(Solarized terminal)
 ;;   ;; name     sRGB      Gen RGB   256       16              8
-;;   '((base03  "#000000" "#728a05" "#1c1c1c" "brightblack"   "black")
-;;     (base02  "#222222" "#728a05" "#262626" "black"         "black")
-;;     (base01  "#444444" "#728a05" "#585858" "brightgreen"   "green")
-;;     (base00  "#555555" "#728a05" "#626262" "brightyellow"  "yellow")
-;;     (base0   "#888888" "#728a05" "#808080" "brightblue"    "blue")
-;;     (base1   "#aaaaaa" "#81908f" "#8a8a8a" "brightcyan"    "cyan")
-;;     (base2   "#fafafa" "#e9e2cb" "#e4e4e4" "white"         "white")
-;;     (base3   "#ffffff" "#fcf4dc" "#ffffd7" "brightwhite"   "white")
+;;   '((base03  "#002b36" "#042028" "#1c1c1c" "brightblack"   "black")
+;;     (base02  "#073642" "#0a2832" "#262626" "black"         "black")
+;;     (base01  "#586e75" "#465a61" "#585858" "brightgreen"   "green")
+;;     (base00  "#657b83" "#52676f" "#626262" "brightyellow"  "yellow")
+;;     (base0   "#839496" "#708183" "#808080" "brightblue"    "blue")
+;;     (base1   "#93a1a1" "#81908f" "#8a8a8a" "brightcyan"    "cyan")
+;;     (base2   "#eee8d5" "#e9e2cb" "#e4e4e4" "white"         "white")
+;;     (base3   "#fdf6e3" "#fcf4dc" "#ffffd7" "brightwhite"   "white")
 ;;     (yellow  "#b58900" "#a57705" "#af8700" "yellow"        "yellow")
 ;;     (orange  "#cb4b16" "#bd3612" "#d75f00" "brightred"     "red")
 ;;     (red     "#dc322f" "#c60007" "#d70000" "red"           "red")
@@ -82,7 +93,7 @@
 ;;   "This is a table of all the colors used by the Solarized color theme. Each
 ;;    column is a different set, one of which will be chosen based on term
 ;;    capabilities, etc.")
-
+;; 
 (use-package powerline
   :config
   (powerline-default-theme)
@@ -102,35 +113,108 @@
    whitespace-style       '(face lines-tail))
   :hook
   (prog-mode . whitespace-mode))
-
+ 
 
 (use-package hide-mode-line
   :hook
   (markdown-mode . hide-mode-line-mode))
+
+(use-package adaptive-wrap
+  :hook
+  (markdown-mode . adaptive-wrap-prefix-mode)
+  :custom
+  (adaptive-wrap-extra-indent 1))
+
+(use-package writingroom-mode
+  :hook
+  (markdown-mode . writeroom-mode)
+  :custom
+  (writeroom-global-effects (quote (writeroom-set-bottom-divider-width)))
+  (writeroom-maximize-window nil)
+  (writeroom-width 110))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Configure Interface ;;;;;;;;;;;
 (global-set-key "\C-x\C-m" 'execute-extended-command)
 
 (use-package avy
-  :bind (
-	 ("C-;" . avy-goto-word-or-subword-1)
-	 ("C-'" . avy-goto-line)
-	 ("M-g M-g" . avy-goto-line)
-	 ("M-g g" . avy-goto-line))
   :config
-  (setq avy-background 1))
+  (setq avy-background 1)
+  (bind-keys* 
+   ("C-;" . avy-goto-word-or-subword-1)
+   ("C-'" . avy-goto-line)
+   ("M-g M-g" . avy-goto-line)
+   ("M-g g" . avy-goto-line)))
+ 
+(use-package counsel
+  :config
+  (bind-keys*
+   ("C-o" . counsel-imenu)))
 
+(use-package imenu-list
+  :ensure t
+  :bind (("C-M-o" . imenu-list-smart-toggle))
+  :config
+  (setq imenu-list-auto-resize nil))
 
 (setenv "DICPATH" (concat (getenv "HOME") "/Library/Spelling"))
-(setq ispell-program-name "/usr/local/bin/hunspell")
-(setq ispell-really-hunspell t)
+(setenv "DICTIONARY" "en_US")
+(setq ispell-program-name "hunspell")
+;; below two lines reset the the hunspell to it STOPS querying locale!
+(setq ispell-local-dictionary "en_US") ; "en_US" is key to lookup in `ispell-local-dictionary-alist`
+(setq ispell-local-dictionary-alist
+      '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)))
+
+
+;; move point to previous error
+;; based on code by hatschipuh at
+;; http://emacs.stackexchange.com/a/14912/2017
+(defun flyspell-goto-previous-error (arg)
+  "Go to arg previous spelling error."
+  (interactive "p")
+  (while (not (= 0 arg))
+    (let ((pos (point))
+          (min (point-min)))
+      (if (and (eq (current-buffer) flyspell-old-buffer-error)
+               (eq pos flyspell-old-pos-error))
+          (progn
+            (if (= flyspell-old-pos-error min)
+                ;; goto beginning of buffer
+                (progn
+                  (message "Restarting from end of buffer")
+                  (goto-char (point-max)))
+              (backward-word 1))
+            (setq pos (point))))
+      ;; seek the next error
+      (while (and (> pos min)
+                  (let ((ovs (overlays-at pos))
+                        (r '()))
+                    (while (and (not r) (consp ovs))
+                      (if (flyspell-overlay-p (car ovs))
+                          (setq r t)
+                        (setq ovs (cdr ovs))))
+                    (not r)))
+        (backward-word 1)
+        (setq pos (point)))
+      ;; save the current location for next invocation
+      (setq arg (1- arg))
+      (setq flyspell-old-pos-error pos)
+      (setq flyspell-old-buffer-error (current-buffer))
+      (goto-char pos)
+      (if (= pos min)
+          (progn
+            (message "No more miss-spelled word!")
+            (setq arg 0))
+        (forward-word)))))
+
 
 (use-package flyspell
-  :init
-  (setenv "DICPATH" (concat (getenv "HOME") "/Library/Spelling"))
-  (setq ispell-program-name "/usr/local/bin/hunspell")
-  (setq ispell-really-hunspell t))
+  :config
+  (define-key flyspell-mode-map (kbd "C-.") #'flyspell-popup-correct)
+  :bind (("C-M-," . flyspell-goto-previous-error))
+  )
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Programming Configuration
@@ -170,20 +254,20 @@
     company-active-map (kbd "<tab>") 'company-complete-common-or-cycle))
 
 
-(require 'rx)
-; TODO move this inside use package
-(use-package company-anaconda
-;  :defer t
-  :after company
-;  :init (add-to-list 'company-backends #'company-anaconda :with company-capf))
-  :init (add-to-list 'company-backends '(company-anaconda :with company-capf)))
-
 (use-package company-quickhelp
   :after company
   :custom
   (company-quickhelp-delay 0.7)
   (company-quickhelp-max-lines 30)
   :hook ((company-mode . company-quickhelp-mode)))
+
+(require 'rx)
+; TODO move this inside use package
+(use-package company-anaconda
+;  :defer t
+  :after (company company-quickhelp)
+;  :init (add-to-list 'company-backends #'company-anaconda :with company-capf))
+  :init (add-to-list 'company-backends '(company-anaconda :with company-capf)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Additional Configuration
@@ -228,21 +312,26 @@
 
 
 ;; Enable Ivy (autocompletion for emacs interface (find file, switch buffer, etc)
-(ivy-mode 1)
-(setq ivy-count-format "%d/%d ")
-(global-set-key "\C-s" 'swiper)
+(use-package ivy
+  :config
+  (ivy-mode 1)
+  (setq ivy-count-format "%d/%d ")
+  (global-set-key "\C-s" 'swiper)
+  :custom
+  (ivy-height 15))
 
 
 ;; Default Font
+;; TODO make sure using correct fonts (that include a bold font)
 (cond
  ((member "Anonymous Pro for Powerline" (font-family-list))
   (add-to-list 'default-frame-alist '(font . "Anonymous Pro for Powerline 11"  ))
   )
- ((member "Anonymice Nerd Font" (font-family-list))
-  (add-to-list 'default-frame-alist '(font . "Anonymice Nerd Font 11" ))
-  )
  ((member "Anonymous Pro" (font-family-list))
   (add-to-list 'default-frame-alist '(font . "Anonymous Pro 11"  ))
+  )
+ ((member "Anonymice Nerd Font" (font-family-list))
+  (add-to-list 'default-frame-alist '(font . "Anonymice Nerd Font 11" ))
   )
  ((member "Ubuntu Mono" (font-family-list))
   (add-to-list 'default-frame-alist '(font . "Ubuntu Mono 10"  ))
@@ -253,6 +342,19 @@
  )
 
 ;; Set Git-hub Flavored Markdown
+(use-package markdown-mode
+  :config
+
+  :custom
+  (markdown-hide-urls t))
+
+(use-package markdown-toc
+  :custom
+   (markdown-toc-header-toc-end "<!-- md-toc end -->")
+   (markdown-toc-header-toc-start "<!-- md-toc start -->")
+   (markdown-toc-header-toc-title "## Table of Contents"))
+
+
 (setq markdown-command "pandoc -f markdown_github -t html5 --mathjax -H ~/.emacs.d/markdown/style_include.css")
 
 ;; Setup modes
