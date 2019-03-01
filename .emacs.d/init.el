@@ -69,7 +69,6 @@
 
   :config
   (load-theme 'solarized t)
-  (set-face-attribute 'outline-4 nil :foreground "#d33682")
   (custom-theme-set-faces 'solarized '(fringe ((nil)))))
 
 ;; Solarized Colors for reference
@@ -233,7 +232,7 @@
 (use-package python-cell
   :hook
   (python-mode . python-cell-mode)
-  :custom
+;;  :custom
 ;  (python-cell-
   :bind (
 	 ("M-p" . python-backward-cell)
@@ -841,3 +840,5 @@ This is used by `global-hl-todo-mode'."
 (global-set-key (kbd "C-c e") 'rc-cycle-else) 
 (global-set-key (kbd "C-c h") 'rc-cycle-hold)
 (global-set-key (kbd "C-c w") 'rc-cycle-wont)
+
+(set-face-attribute 'outline-4 nil :foreground "#d33682")
