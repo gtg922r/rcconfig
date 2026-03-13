@@ -34,7 +34,7 @@ When the user asks to install a tool, add an alias, change the environment, or m
 3. **Regenerate `~/.bash_local`** if the change involves shell overrides
 4. **Commit and push**
 
-The spec is the source of truth. If the spec and the live system disagree, re-apply from the spec.
+The spec is the source of truth. If the spec and the live system disagree, flag it to the user and ask how they'd like to proceed before making changes. Don't silently re-apply — the divergence might be intentional, or the spec might be the thing that needs updating.
 
 ## What Goes Where
 

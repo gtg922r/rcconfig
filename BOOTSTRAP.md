@@ -10,20 +10,22 @@ git clone https://github.com/gtg922r/rcconfig.git ~/.rcconfig
 
 ## 2. Identify This Machine
 
-Check `machines/` for an existing spec matching this machine. If one exists, symlink it:
+Check if `this_machine.md` already exists as a symlink. If it does, you're set — skip to step 3.
 
-```
-ln -s machines/<name>.md ~/.rcconfig/this_machine.md
-```
+Otherwise, check `machines/` for a spec that matches the hostname (`hostname -s`). If one exists, confirm with the user: "This looks like [name] — is that right?" If they confirm, create the symlink.
 
-If no spec exists yet, create one. Copy `machines/_template.md` to `machines/<name>.md` and ask the user:
+If no matching spec exists, ask the user what name to use (suggest the hostname as default). Then create a new spec — copy `machines/_template.md` to `machines/<name>.md` and ask:
 
 - What is this machine? (VM, laptop, desktop?)
 - What's it for?
 - Any specific tools or packages beyond the baseline?
 - Color/vibe preference for the login banner?
 
-Then create the symlink.
+Then create the symlink:
+
+```
+ln -s machines/<name>.md ~/.rcconfig/this_machine.md
+```
 
 ## 3. Link Shell Configs
 
