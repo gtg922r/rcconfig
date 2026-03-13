@@ -1,0 +1,3 @@
+# Generated files live in ~ not in this repo
+*.bak.*
+.DS_Store

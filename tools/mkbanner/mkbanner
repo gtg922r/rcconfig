@@ -1,0 +1,260 @@
+#!/bin/bash
+#
+# mkbanner - Generate gradient ASCII art banners with centered subtitles
+#
+# Uses the ANSI Shadow figlet font (same as manytools.org/hacker-tools/ascii-banner)
+# Supports true-color (24-bit) gradient effects.
+#
+
+set -euo pipefail
+
+# Force UTF-8 for correct Unicode string handling
+export LC_ALL=C.UTF-8
+
+# =============================================================================
+# Configuration
+# =============================================================================
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly FONT_FILE="${SCRIPT_DIR}/ansi_shadow.flf"
+readonly FONT_FALLBACKS=(
+    "/usr/share/figlet/ansi_shadow.flf"
+    "/usr/local/share/figlet/ansi_shadow.flf"
+)
+
+# ANSI escape codes
+readonly RESET=$'\033[0m'
+readonly BOLD=$'\033[1m'
+
+# Default gradient
+readonly DEFAULT_START="255,255,255"
+readonly DEFAULT_END="180,180,180"
+
+# =============================================================================
+# Utility Functions
+# =============================================================================
+
+die() { echo "Error: $1" >&2; exit 1; }
+
+usage() {
+    cat <<'EOF'
+Usage: mkbanner [OPTIONS] <TITLE> [SUBTITLE]
+
+Generate gradient ASCII art banners using the ANSI Shadow figlet font.
+
+Arguments:
+  TITLE       Text to render as ASCII art (usually uppercase)
+  SUBTITLE    Optional tagline centered beneath the banner
+
+Color Options (mutually exclusive):
+  -m, --middle R,G,B       Single color; auto-generates lighter-to-darker gradient
+  -s, --start R,G,B        Start color (requires --end)
+  -e, --end R,G,B          End color (requires --start)
+  -g, --gradient C1:C2:..  Explicit colors (colon-separated R,G,B values)
+
+Other Options:
+  -p, --padding N          Left padding in spaces (default: 0)
+  -t, --subtitle-color R,G,B  Subtitle color (default: first gradient color)
+  -B, --no-bold            Disable bold text
+  -h, --help               Show this help
+
+Examples:
+  mkbanner PYRONIC "exe.dev development VM"
+  mkbanner -m 170,140,210 PYRONIC
+  mkbanner -s 200,170,220 -e 125,100,195 PYRONIC
+  mkbanner -s 136,192,208 -e 56,112,148 -p 8 ATLAS "autonomous total life assistant system"
+
+Environment:
+  MKBANNER_CHAR_WIDTH=2    Set if your terminal renders box-drawing chars as double-width
+
+EOF
+    exit 0
+}
+
+# =============================================================================
+# Color Functions
+# =============================================================================
+
+# Validate R,G,B format
+parse_rgb() {
+    local rgb="$1"
+    [[ "$rgb" =~ ^[0-9]+,[0-9]+,[0-9]+$ ]] || die "Invalid color: $rgb (expected R,G,B)"
+    echo "$rgb"
+}
+
+# Convert R,G,B to ANSI 24-bit color escape
+rgb_to_ansi() {
+    IFS=',' read -r r g b <<< "$1"
+    printf '\033[38;2;%d;%d;%dm' "$r" "$g" "$b"
+}
+
+# Clamp value to 0-255 range
+clamp() {
+    local v=$1
+    (( v < 0 )) && v=0
+    (( v > 255 )) && v=255
+    echo "$v"
+}
+
+# Linear interpolation between two colors
+# Usage: lerp_color start_rgb end_rgb position total_steps
+lerp_color() {
+    local start="$1" end="$2" pos="$3" total="$4"
+    IFS=',' read -r sr sg sb <<< "$start"
+    IFS=',' read -r er eg eb <<< "$end"
+    
+    (( total <= 1 )) && { echo "$sr,$sg,$sb"; return; }
+    
+    local denom=$(( total - 1 ))
+    echo "$(( sr + (er - sr) * pos / denom )),$(( sg + (eg - sg) * pos / denom )),$(( sb + (eb - sb) * pos / denom ))"
+}
+
+# Generate gradient array between two colors
+# Usage: make_gradient start_rgb end_rgb num_steps
+make_gradient() {
+    local start="$1" end="$2" n="$3"
+    for (( i = 0; i < n; i++ )); do
+        lerp_color "$start" "$end" "$i" "$n"
+    done
+}
+
+# Generate gradient from middle color (lightens up, darkens down)
+# Usage: gradient_from_middle middle_rgb num_steps
+gradient_from_middle() {
+    IFS=',' read -r mr mg mb <<< "$1"
+    local n="$2"
+    
+    # Lighten by 30 for start, darken by 45 for end
+    local start="$(clamp $((mr + 30))),$(clamp $((mg + 30))),$(clamp $((mb + 30)))"
+    local end="$(clamp $((mr - 45))),$(clamp $((mg - 45))),$(clamp $((mb - 45)))"
+    
+    make_gradient "$start" "$end" "$n"
+}
+
+# =============================================================================
+# Display Width Calculation
+# =============================================================================
+
+# Calculate display width accounting for Unicode box-drawing characters
+# Most terminals render these as single-width; set MKBANNER_CHAR_WIDTH=2 if not
+display_width() {
+    local str="$1"
+    local ascii_count non_ascii char_width
+    
+    ascii_count=$(printf '%s' "$str" | tr -cd ' -~' | wc -c)
+    non_ascii=$(( ${#str} - ascii_count ))
+    char_width="${MKBANNER_CHAR_WIDTH:-1}"
+    
+    echo $(( non_ascii * char_width + ascii_count ))
+}
+
+# =============================================================================
+# Font Handling
+# =============================================================================
+
+find_font() {
+    [[ -f "$FONT_FILE" ]] && { echo "$FONT_FILE"; return; }
+    
+    for f in "${FONT_FALLBACKS[@]}"; do
+        [[ -f "$f" ]] && { echo "$f"; return; }
+    done
+    
+    die "ANSI Shadow font not found. Get it from:\nhttps://raw.githubusercontent.com/xero/figlet-fonts/master/ANSI%20Shadow.flf"
+}
+
+# =============================================================================
+# Main
+# =============================================================================
+
+main() {
+    local middle="" start="" end="" gradient="" padding=0 bold=true title="" subtitle="" subtitle_rgb=""
+    
+    # Parse arguments
+    while (( $# )); do
+        case "$1" in
+            -m|--middle)   middle=$(parse_rgb "$2"); shift 2 ;;
+            -s|--start)    start=$(parse_rgb "$2"); shift 2 ;;
+            -e|--end)      end=$(parse_rgb "$2"); shift 2 ;;
+            -g|--gradient) gradient="$2"; shift 2 ;;
+            -p|--padding)  padding="$2"; shift 2 ;;
+            -t|--subtitle-color) subtitle_rgb=$(parse_rgb "$2"); shift 2 ;;
+            -B|--no-bold)  bold=false; shift ;;
+            -h|--help)     usage ;;
+            -*)            die "Unknown option: $1" ;;
+            *)             [[ -z "$title" ]] && title="$1" || subtitle="$1"; shift ;;
+        esac
+    done
+    
+    [[ -z "$title" ]] && usage
+    
+    # Validate color options
+    local opts=0
+    [[ -n "$middle" ]] && (( ++opts ))
+    [[ -n "$start" || -n "$end" ]] && (( ++opts ))
+    [[ -n "$gradient" ]] && (( ++opts ))
+    
+    (( opts > 1 )) && die "Use only one of: --middle, --start/--end, --gradient"
+    [[ -n "$start" && -z "$end" || -z "$start" && -n "$end" ]] && die "--start and --end must be used together"
+    
+    # Generate banner via figlet
+    local font banner
+    font=$(find_font)
+    banner=$(figlet -f "$font" "$title")
+    
+    # Parse lines, removing trailing blank lines
+    local lines=()
+    while IFS= read -r line; do lines+=("$line"); done <<< "$banner"
+    while (( ${#lines[@]} )) && [[ -z "${lines[-1]// /}" ]]; do unset 'lines[-1]'; done
+    
+    local num_lines=${#lines[@]}
+    
+    # Build color array
+    local colors=()
+    if [[ -n "$gradient" ]]; then
+        IFS=':' read -ra colors <<< "$gradient"
+        for c in "${colors[@]}"; do parse_rgb "$c" >/dev/null; done
+    elif [[ -n "$middle" ]]; then
+        mapfile -t colors < <(gradient_from_middle "$middle" "$num_lines")
+    elif [[ -n "$start" ]]; then
+        mapfile -t colors < <(make_gradient "$start" "$end" "$num_lines")
+    else
+        mapfile -t colors < <(make_gradient "$DEFAULT_START" "$DEFAULT_END" "$num_lines")
+    fi
+    
+    # Build padding string
+    local pad
+    printf -v pad '%*s' "$padding" ''
+    
+    # Output banner with gradient
+    local bold_code=""
+    [[ "$bold" == true ]] && bold_code="$BOLD"
+    
+    for (( i = 0; i < num_lines; i++ )); do
+        local color
+        color=$(rgb_to_ansi "${colors[i % ${#colors[@]}]}")
+        printf '%s%s%s%s%s\n' "$bold_code" "$color" "$pad" "${lines[i]}" "$RESET"
+    done
+    
+    # Output centered subtitle
+    if [[ -n "$subtitle" ]]; then
+        local banner_width=0
+        for line in "${lines[@]}"; do
+            local w
+            w=$(display_width "$line")
+            (( w > banner_width )) && banner_width=$w
+        done
+        
+        local sub_pad=$(( (padding + banner_width - ${#subtitle}) / 2 ))
+        (( sub_pad < 0 )) && sub_pad=0
+        
+        local sub_color
+        if [[ -n "$subtitle_rgb" ]]; then
+            sub_color=$(rgb_to_ansi "$subtitle_rgb")
+        else
+            sub_color=$(rgb_to_ansi "${colors[0]}")
+        fi
+        printf '%s%s%*s%s%s\n' "$bold_code" "$sub_color" "$sub_pad" '' "$subtitle" "$RESET"
+    fi
+}
+
+main "$@"
