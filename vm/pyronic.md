@@ -1,89 +1,54 @@
----
-hostname: pyronic
-description: "Primary exe.dev development VM"
-created: 2025-01-13
-
-banner:
-  text: PYRONIC
-  subtitle: "exe.dev development VM"
-  gradient_start: "200,170,220"
-  gradient_end: "125,100,195"
-  padding: 2
-  info_box: true
-
-packages:
-  apt:
-    - bat
-    - emacs
-    - figlet
-  nvm: latest
-  node: lts
-  npm_global:
-    - "@google/gemini-cli@preview"
-
-cli_tools:
-  github_cli:
-    install: apt
-    auth_user: gtg922r
-    auth_protocol: https
-  cursor_cli: true
-
-repos:
-  - repo: gtg922r/ai-workflow
-    path: ~/ai-workflow
-    private: true
-  - repo: gtg922r/helping-hands
-    path: ~/helping-hands
-    private: true
-  - repo: gtg922r/llm-council
-    path: ~/llm-council
-    private: true
-  - repo: gtg922r/obsidian-numerals
-    path: ~/obsidian-numerals
-  - repo: gtg922r/obsidian-sankey
-    path: ~/obsidian-sankey
-  - repo: gtg922r/obsidian-entities
-    path: ~/obsidian-entities
-  - repo: gtg922r/Minerva
-    path: ~/Minerva
-    private: true
-  - repo: gtg922r/iris-sync
-    path: ~/iris-sync
-    private: true
-  - repo: gtg922r/hermes
-    path: ~/hermes
-    private: true
-  - repo: gtg922r/hestia-timer
-    path: ~/hestia-timer
-    private: true
-
-shell_extras:
-  aliases: {}
-  env: {}
----
-
 # Pyronic
 
-> Primary development VM on exe.dev. General-purpose coding, experimentation, and project hosting.
+> Primary exe.dev development VM. General-purpose coding, experimentation, and project hosting.
 
-## Purpose
+Created: 2025-01-13
 
-Main workhorse VM. Hosts multiple active projects including Obsidian plugins, web apps, sync tools, and LLM experiments. This is the daily driver.
+## Packages
 
-## Active Projects
+Install via apt:
+- bat (syntax-highlighting cat replacement; alias `bat` to `batcat`)
+- emacs
+- figlet (required by mkbanner)
 
-See `~/PYRONIC_APPS.md` for full descriptions of all hosted projects.
+Install nvm (latest stable), then Node.js LTS as the default.
 
-Key areas:
-- **Obsidian plugins** — numerals, sankey, entities
-- **Web apps** — helping-hands, llm-council, Minerva
-- **Infrastructure** — iris-sync, hermes, hestia-timer
-- **AI tooling** — ai-workflow
+## CLI Tools
+
+- **GitHub CLI** — install via apt, authenticate as gtg922r (https protocol)
+- **Cursor CLI** — install via the official installer, available as `agent` command
+
+## npm Global Packages
+
+- `@google/gemini-cli@preview` — run with `gemini`
+
+## Banner
+
+Generate `~/.bash_banner` using `~/.rcconfig/tools/mkbanner/mkbanner`.
+
+- Title: PYRONIC
+- Subtitle: "exe.dev development VM"
+- Lavender → purple gradient: start 200,170,220 end 125,100,195
+- Padding: 2
+- Include an info box below the art showing HOST, DATE, TIME, and SHELLEY version
+
+## Repositories
+
+All private unless noted. Clone via `gh repo clone`.
+
+- gtg922r/ai-workflow → ~/ai-workflow
+- gtg922r/helping-hands → ~/helping-hands
+- gtg922r/llm-council → ~/llm-council
+- gtg922r/obsidian-numerals → ~/obsidian-numerals (public)
+- gtg922r/obsidian-sankey → ~/obsidian-sankey (public)
+- gtg922r/obsidian-entities → ~/obsidian-entities (public)
+- gtg922r/Minerva → ~/Minerva
+- gtg922r/iris-sync → ~/iris-sync
+- gtg922r/hermes → ~/hermes
+- gtg922r/hestia-timer → ~/hestia-timer
 
 ## Notes
 
-- Created 2025-01-13
-- GitHub CLI authenticated as gtg922r
-- Shelley (exe.dev coding agent) is the primary LLM agent
-- Banner uses lavender → purple gradient
-- See `~/VMCONFIG.md` for historical config changelog
+- This is the daily driver. Hosts Obsidian plugins, web apps, sync tools, and LLM experiments.
+- See `~/PYRONIC_APPS.md` for full project descriptions.
+- Shelley is the primary LLM coding agent on this VM.

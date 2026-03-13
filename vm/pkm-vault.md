@@ -1,49 +1,37 @@
----
-hostname: pkm-vault
-description: "Personal knowledge management and Obsidian vault sync"
-created: 2025-07-14
-
-banner:
-  text: PKM-VAULT
-  subtitle: "knowledge management VM"
-  gradient_start: "136,192,208"
-  gradient_end: "56,112,148"
-  padding: 2
-  info_box: true
-
-packages:
-  apt:
-    - bat
-    - emacs
-    - figlet
-  nvm: latest
-  node: lts
-  npm_global:
-    - "@google/gemini-cli@preview"
-
-cli_tools:
-  github_cli:
-    install: apt
-    auth_user: gtg922r
-    auth_protocol: https
-  cursor_cli: true
-
-repos: []
-
-shell_extras:
-  aliases: {}
-  env: {}
----
-
 # PKM-Vault
 
 > Personal knowledge management and Obsidian vault operations.
 
-## Purpose
+Created: 2025-07-14
 
-Dedicated VM for PKM workflows, Obsidian vault sync, and knowledge base tooling.
+## Packages
+
+Install via apt:
+- bat (syntax-highlighting cat replacement; alias `bat` to `batcat`)
+- emacs
+- figlet (required by mkbanner)
+
+Install nvm (latest stable), then Node.js LTS as the default.
+
+## CLI Tools
+
+- **GitHub CLI** — install via apt, authenticate as gtg922r (https protocol)
+- **Cursor CLI** — install via the official installer, available as `agent` command
+
+## npm Global Packages
+
+- `@google/gemini-cli@preview` — run with `gemini`
+
+## Banner
+
+Generate `~/.bash_banner` using `~/.rcconfig/tools/mkbanner/mkbanner`.
+
+- Title: PKM-VAULT
+- Subtitle: "knowledge management VM"
+- Nord blue gradient: start 136,192,208 end 56,112,148
+- Padding: 2
+- Include an info box below the art showing HOST, DATE, TIME, and SHELLEY version
 
 ## Notes
 
-- Created 2025-07-14
-- Nord blue gradient for banner
+- Dedicated VM for PKM workflows, Obsidian vault sync, and knowledge base tooling.

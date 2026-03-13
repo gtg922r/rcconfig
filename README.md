@@ -1,33 +1,24 @@
 # rcconfig
 
-Declarative shell configuration for cloud VMs, designed for the LLM agent era.
+Shell configuration for cloud VMs, written for humans and LLM agents to read together.
 
-Clone to `~/.rcconfig` on any VM. An LLM agent can read `AGENTS.md` and fully bootstrap the machine.
-
-## Quick Start
+Clone to `~/.rcconfig` on any VM. An agent can read `AGENTS.md` and bootstrap the machine from there.
 
 ```bash
 git clone https://github.com/gtg922r/rcconfig.git ~/.rcconfig
-# Then tell your LLM agent: "Bootstrap this VM using ~/.rcconfig"
+# Then tell your agent: "Bootstrap this VM using ~/.rcconfig"
 ```
-
-## Philosophy
-
-- **Declarative over imperative** — VM specs describe *what* should exist, not *how* to install it
-- **Single branch, flat fleet** — every VM's spec lives in `vm/` on main. No branch gymnastics
-- **Spec is source of truth** — if the system and spec disagree, re-apply from spec
-- **LLM-native** — `AGENTS.md` gives any coding agent full context to bootstrap or maintain a VM
 
 ## Structure
 
 ```
-AGENTS.md           ← LLM agents start here
-shell/              ← Shared bash configs (symlinked into ~)
-tools/mkbanner/     ← ASCII art banner generator
-vm/                 ← Per-VM declarative specs
-vm/_template.md     ← Copy this for new VMs
+AGENTS.md            Agent reads this first
+shell/               Shared bash configs (symlinked into ~)
+tools/mkbanner/      ASCII art banner generator
+vm/                  One file per VM — the fleet registry
+vm/_template.md      Starting point for new VMs
 ```
 
-## Fleet
+## Adding a New VM
 
-See `vm/` for all configured VMs. Each `.md` file is a complete declarative spec.
+Copy `vm/_template.md` to `vm/<hostname>.md`, describe what you want, and let your agent handle the rest.
