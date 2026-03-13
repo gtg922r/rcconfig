@@ -42,6 +42,12 @@ Anything here gets generated into `~/.bash_local`. The shared bashrc sources it 
 
 [List repos to clone, with target paths. Note which are private (require gh auth).]
 
+## Agent Integration
+
+If this machine runs an LLM coding agent (Shelley, etc.), add the following to its root-level agent config (e.g., `~/.config/shelley/AGENTS.md`):
+
+> This machine's environment is managed by `~/.rcconfig`. Read `~/.rcconfig/AGENTS.md` for the full contract. The short version: when you install tools, add aliases, or change the environment, update `~/.rcconfig/this_machine.md` first, then apply the change. The spec is the source of truth.
+
 ## Notes
 
 [Anything else an agent or human should know about this machine.]
