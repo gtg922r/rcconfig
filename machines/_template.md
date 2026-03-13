@@ -1,8 +1,9 @@
-# [VM Name]
+# [Machine Name]
 
-> One-line description of what this VM is for.
+> One-line description of what this machine is for.
 
 Created: [date]
+Type: [VM / laptop / desktop]
 
 ## Packages
 
@@ -26,16 +27,16 @@ Install nvm (latest stable), then Node.js LTS as the default.
 
 Generate `~/.bash_banner` using `~/.rcconfig/tools/mkbanner/mkbanner`.
 
-- Title: [VM hostname in uppercase]
+- Title: [machine name in uppercase]
 - Subtitle: [short description]
-- Colors: [pick something that fits the VM's vibe, or use the lavender default: start 200,170,220 end 125,100,195]
+- Colors: [pick something that fits, or use the lavender default: start 200,170,220 end 125,100,195]
 - Include an info box below the art showing HOST, DATE, TIME, and SHELLEY version (see pyronic's banner as reference)
 
-## VM-Specific Shell Config
+## Machine-Specific Shell Config
 
-Generate `~/.bash_local` with any overrides needed for this VM. The shared bashrc sources it last, so anything here wins.
+Anything here gets generated into `~/.bash_local`. The shared bashrc sources it last, so overrides win.
 
-[Add any VM-specific aliases, environment variables, or shell tweaks here. Delete this section if none needed.]
+[Add any machine-specific aliases, environment variables, or shell tweaks here. Delete this section if none needed.]
 
 ## Repositories
 
@@ -43,4 +44,4 @@ Generate `~/.bash_local` with any overrides needed for this VM. The shared bashr
 
 ## Notes
 
-[Anything else an agent or human should know about this VM.]
+[Anything else an agent or human should know about this machine.]

@@ -1,24 +1,24 @@
 # rcconfig
 
-Shell configuration for cloud VMs, written for humans and LLM agents to read together.
+Shell and environment configuration for all machines — VMs, laptops, desktops. Written for humans and LLM agents to read together.
 
-Clone to `~/.rcconfig` on any VM. An agent can read `AGENTS.md` and bootstrap the machine from there.
+Clone to `~/.rcconfig`. An agent can read `BOOTSTRAP.md` to set up a new machine, or `AGENTS.md` to maintain an existing one.
 
 ```bash
 git clone https://github.com/gtg922r/rcconfig.git ~/.rcconfig
-# Then tell your agent: "Bootstrap this VM using ~/.rcconfig"
 ```
 
 ## Structure
 
 ```
-AGENTS.md            Agent reads this first
+AGENTS.md            How agents should maintain this machine
+BOOTSTRAP.md         First-time setup for a new machine
+this_machine.md      → symlink to this machine's spec (gitignored)
+machines/            One file per machine — the fleet registry
 shell/               Shared bash configs (symlinked into ~)
 tools/mkbanner/      ASCII art banner generator
-vm/                  One file per VM — the fleet registry
-vm/_template.md      Starting point for new VMs
 ```
 
-## Adding a New VM
+## Adding a New Machine
 
-Copy `vm/_template.md` to `vm/<hostname>.md`, describe what you want, and let your agent handle the rest.
+Copy `machines/_template.md` to `machines/<name>.md`, describe what you want, symlink it as `this_machine.md`, and let your agent handle the rest.

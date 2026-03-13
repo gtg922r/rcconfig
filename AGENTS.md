@@ -1,38 +1,43 @@
 # rcconfig — Agent Guide
 
-This repo defines how VMs should be configured. It lives at `~/.rcconfig`.
+This repo is the source of truth for shell and environment configuration across all machines (VMs, laptops, desktops). It lives at `~/.rcconfig`.
 
-## How This Works
+For first-time setup of a new machine, see `BOOTSTRAP.md`.
 
-**Shared shell configs** live in `shell/`. They get symlinked into `~` as dotfiles (e.g., `shell/bashrc` → `~/.bashrc`). These are the same across all VMs.
+## Identifying This Machine
 
-**VM-specific configs** live in `vm/<hostname>.md`. Each file is a complete, readable description of what should be installed and configured on that machine. If a VM needs different aliases, extra tools, or custom environment variables, that's described in its VM spec — and you generate `~/.bash_local` with whatever's needed. The shared bashrc sources `~/.bash_local` at the end, so VM-specific overrides always win.
+`this_machine.md` is a symlink to this machine's spec in `machines/`. It's gitignored — every machine points to its own file. Read it to know what this machine is and how it should be configured.
 
-**The banner** is generated per-VM using `tools/mkbanner/`. The VM spec describes the desired look. You generate `~/.bash_banner` with the banner art plus an info box showing host, date, time, and Shelley version. See pyronic's spec for the reference pattern.
+## Repo Layout
 
-## Bootstrap a New VM
+```
+this_machine.md      → machines/<name>.md (gitignored symlink)
+machines/            One spec per machine — the fleet registry
+shell/               Shared bash configs (symlinked into ~)
+tools/mkbanner/      ASCII art banner generator
+```
 
-1. Clone this repo to `~/.rcconfig`
-2. Look for `vm/<hostname>.md` — if it doesn't exist, read `vm/_template.md` and create one by asking the user:
-   - What's this VM for?
-   - Any specific tools or packages needed?
-   - Color/vibe preference for the banner?
-3. Symlink shared shell configs from `shell/` into `~` (back up any existing files first)
-4. Read the VM spec and make it so — install packages, set up tools, generate the banner and bash_local
-5. Verify everything loads: `source ~/.bashrc`
+## How Configuration Works
+
+**Shared shell configs** in `shell/` are symlinked into `~` as dotfiles. They're the same on every machine.
+
+**Machine-specific config** is described in each machine's spec (`machines/<name>.md`). Anything that needs to differ — extra aliases, environment variables, tool-specific setup — gets generated into `~/.bash_local`, which the shared bashrc sources last. Machine-specific overrides always win.
+
+**The banner** is generated per-machine using `tools/mkbanner/`. The machine spec describes the desired look. The output goes to `~/.bash_banner`.
 
 ## Ongoing Maintenance
 
-When the user asks to change something about the VM's environment:
+When the user asks to install a tool, add an alias, change the environment, or modify any aspect of this machine's setup:
 
-1. **Update the VM spec first** — it's the source of truth
-2. Apply the change to the live system
-3. Commit and push
+1. **Update the machine spec first** — open `this_machine.md` and describe the change
+2. **Apply the change** to the live system
+3. **Regenerate `~/.bash_local`** if the change involves shell overrides
+4. **Commit and push**
 
-If the spec and reality disagree, the spec wins.
+The spec is the source of truth. If the spec and the live system disagree, re-apply from the spec.
 
 ## What Goes Where
 
-- **In this repo:** shared shell configs, mkbanner tool, VM specs
+- **In this repo:** shared shell configs, mkbanner tool, machine specs
 - **Generated into `~`:** `.bash_banner`, `.bash_local` (not tracked in git)
 - **Never in this repo:** secrets, auth tokens, SSH keys

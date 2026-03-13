@@ -1,3 +1,6 @@
 # Generated files live in ~ not in this repo
 *.bak.*
 .DS_Store
+
+# Local machine identity (symlink to machines/<name>.md)
+this_machine.md
