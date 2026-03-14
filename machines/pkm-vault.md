@@ -11,7 +11,7 @@ Install via apt:
 - emacs
 - figlet (required by mkbanner)
 
-Install nvm (latest stable), then Node.js LTS as the default.
+Install Node.js 22 via NodeSource apt repo (required by obsidian-headless).
 
 ## CLI Tools
 
@@ -20,6 +20,7 @@ Install nvm (latest stable), then Node.js LTS as the default.
 
 ## npm Global Packages
 
+- `obsidian-headless` — Obsidian Sync headless client (`ob` command)
 - `@google/gemini-cli@preview` — run with `gemini`
 
 ## Banner
@@ -32,6 +33,11 @@ Generate `~/.bash_banner` using `~/.rcconfig/tools/mkbanner/mkbanner`.
 - Padding: 2
 - Include an info box below the art showing HOST, DATE, TIME, and SHELLEY version
 
+## Systemd Services
+
+- **obsidian-sync** — runs `ob sync --path /home/exedev/vault --continuous` to keep the "Personal" vault in sync. Config: bidirectional, all file types, merge conflicts, device name `exe-dev-vm`.
+
 ## Notes
 
 - Dedicated VM for PKM workflows, Obsidian vault sync, and knowledge base tooling.
+- Obsidian "Personal" vault syncs to `/home/exedev/vault/` via obsidian-headless.
