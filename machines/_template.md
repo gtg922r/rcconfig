@@ -17,7 +17,7 @@ Install nvm (latest stable), then Node.js LTS as the default.
 ## CLI Tools
 
 - **GitHub CLI** — install via apt, authenticate as gtg922r (https protocol)
-- **Cursor CLI** — install via the official installer, available as `agent` command
+- **Cursor CLI** — install via the official installer (see https://cursor.com/docs/cli/headless), available as `agent` command
 
 ## npm Global Packages
 
