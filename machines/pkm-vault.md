@@ -41,13 +41,15 @@ Generate `~/.bash_banner` using `~/.rcconfig/tools/mkbanner/mkbanner`.
 
 - **obsidian-sync** — runs `ob sync --path /home/exedev/vault --continuous` to keep the "Personal" vault in sync. Config: bidirectional, all file types, merge conflicts, device name `exe-dev-vm`.
 - **silverbullet** — SilverBullet server on `127.0.0.1:3000`, serving `~/vault`. Shell backend disabled. Ignores `.obsidian/*`.
-- **nginx** — reverse proxy on ports 80 and 8000, proxies to SilverBullet. Enforces email whitelist (`rc@ryancash.com`) via `X-ExeDev-Email` header. Allows unauthenticated access to PWA assets (`/service_worker.js`, `/.client/`).
+- **nginx** — reverse proxy on port 80, proxies to SilverBullet. Enforces email whitelist (`rc@ryancash.com`) via `X-ExeDev-Email` header.
 
 ## Web Access
 
-- SilverBullet is accessible at `https://pkm-vault.exe.xyz/` via the exe.dev HTTPS proxy (private, requires exe.dev login).
+- SilverBullet is accessible at `https://pkm-vault.exe.xyz/` via the exe.dev HTTPS proxy.
+- Proxy is **private** (default) — exe.dev requires login before forwarding requests.
 - nginx provides a second auth layer: only requests with `X-ExeDev-Email: rc@ryancash.com` are allowed through.
 - The exe.dev proxy target port must be set to 80 via `ssh exe.dev share port pkm-vault 80` (run from outside the VM).
+- PWA/offline is disabled — visit with `?enableSW=0` on first load (persistent per browser).
 
 ## Notes
 
