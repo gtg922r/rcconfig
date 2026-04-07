@@ -45,10 +45,21 @@ Read `this_machine.md` and make it real:
 - Generate `~/.bash_banner` using `tools/mkbanner/` with the banner settings from the spec
 - Generate `~/.bash_local` with any machine-specific aliases, env vars, or overrides
 
-## 5. Verify
+## 5. Credential Vault (optional)
+
+If this machine needs encrypted credential storage (e.g., for LLM agent access control):
+
+```bash
+sudo apt install gocryptfs    # or: brew install gocryptfs
+vault-init                    # creates encrypted volume, prompts for password
+```
+
+Save the master key it displays. Then add app credentials — see `vault/README.md`.
+
+## 6. Verify
 
 `source ~/.bashrc` and confirm everything loads cleanly. The banner should display, the prompt should look right, and all declared tools should be available.
 
-## 6. Commit the Spec
+## 7. Commit the Spec
 
 If a new machine spec was created in step 2, commit and push it so the fleet registry stays current.

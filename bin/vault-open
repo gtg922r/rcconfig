@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Open (mount) the encrypted credential vault, activate symlinks.
+set -euo pipefail
+
+CIPHER_DIR="$HOME/.config/credentialVault/cipher"
+MNT_DIR="$HOME/.credentialVault"
+LINKS_CONF="$HOME/.config/credentialVault/links.conf"
+
+if mountpoint -q "$MNT_DIR" 2>/dev/null; then
+    echo "✅ Vault is already open at $MNT_DIR"
+    exit 0
+fi
+
+if [ ! -f "$CIPHER_DIR/gocryptfs.conf" ]; then
+    echo "❌ Vault not initialized. Run: vault-init"
+    exit 1
+fi
+
+gocryptfs "$CIPHER_DIR" "$MNT_DIR"
+
+# Activate symlinks from links.conf
+if [ -f "$LINKS_CONF" ]; then
+    while IFS= read -r line || [ -n "$line" ]; do
+        line="${line%%#*}"               # strip comments
+        [[ -z "${line// /}" ]] && continue  # skip blank lines
+        read -r vault_dir target <<< "$line"
+        target="${target/#\~/$HOME}"
+        mkdir -p "$(dirname "$target")"
+        # Remove target if it's a real dir (not a symlink) so ln doesn't nest inside it
+        [ -d "$target" ] && [ ! -L "$target" ] && rm -rf "$target"
+        ln -sfn "$MNT_DIR/$vault_dir" "$target"
+    done < "$LINKS_CONF"
+fi
+
+echo "✅ Vault opened at $MNT_DIR"

@@ -48,6 +48,10 @@ If this machine runs an LLM coding agent (Shelley, etc.), add the following to i
 
 > This machine's environment is managed by `~/.rcconfig`. Read `~/.rcconfig/AGENTS.md` for the full contract. The short version: when you install tools, add aliases, or change the environment, update `~/.rcconfig/this_machine.md` first, then apply the change. The spec is the source of truth.
 
+## Credential Vault
+
+[If this machine uses the credential vault, list what's stored and any app-specific links.conf entries. Delete this section if not using the vault.]
+
 ## Notes
 
 [Anything else an agent or human should know about this machine.]
