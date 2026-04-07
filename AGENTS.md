@@ -14,6 +14,9 @@ For first-time setup of a new machine, see `BOOTSTRAP.md`.
 this_machine.md      → machines/<name>.md (gitignored symlink)
 machines/            One spec per machine — the fleet registry
 shell/               Shared bash configs (symlinked into ~)
+init.sh              Sourced from bashrc — PATH, vault env, shell helpers
+bin/                 All executable scripts (single PATH entry)
+vault/               Encrypted credential vault docs (see vault/README.md)
 tools/mkbanner/      ASCII art banner generator
 ```
 
@@ -36,8 +39,19 @@ When the user asks to install a tool, add an alias, change the environment, or m
 
 The spec is the source of truth. If the spec and the live system disagree, flag it to the user and ask how they'd like to proceed before making changes. Don't silently re-apply — the divergence might be intentional, or the spec might be the thing that needs updating.
 
+## Credential Vault
+
+The vault (`vault/`) provides an encrypted credential store using gocryptfs. See `vault/README.md` for full details.
+
+- **`vault-open` / `vault-close`** control access to credentials
+- Env vars in `~/.credentialVault/.env` are loaded automatically when the vault is open
+- Symlink mappings in `~/.config/credentialVault/links.conf` connect app credential dirs
+- For services that spawn bare `bash -c` shells, set `BASH_ENV=~/.rcconfig/vault/vault-bash-env.sh` via systemd drop-in
+
+Don't store vault contents (`.env`, credentials) in this repo. Only the scripts and documentation are tracked.
+
 ## What Goes Where
 
-- **In this repo:** shared shell configs, mkbanner tool, machine specs
+- **In this repo:** shared shell configs, init.sh, vault scripts, mkbanner tool, machine specs
 - **Generated into `~`:** `.bash_banner`, `.bash_local` (not tracked in git)
-- **Never in this repo:** secrets, auth tokens, SSH keys
+- **Never in this repo:** secrets, auth tokens, SSH keys, vault contents

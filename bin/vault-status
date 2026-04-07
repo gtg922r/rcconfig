@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Check credential vault status.
+MNT_DIR="$HOME/.credentialVault"
+LINKS_CONF="$HOME/.config/credentialVault/links.conf"
+
+if mountpoint -q "$MNT_DIR" 2>/dev/null; then
+    echo "🔓 Vault is OPEN at $MNT_DIR"
+    echo ""
+    echo "Contents:"
+    ls -A "$MNT_DIR"
+    echo ""
+    echo "Active links:"
+    if [ -f "$LINKS_CONF" ]; then
+        while IFS= read -r line || [ -n "$line" ]; do
+            line="${line%%#*}"
+            [[ -z "${line// /}" ]] && continue
+            read -r vault_dir target <<< "$line"
+            target="${target/#\~/$HOME}"
+            echo "  $target -> $MNT_DIR/$vault_dir"
+        done < "$LINKS_CONF"
+    fi
+    if [ -f "$MNT_DIR/.env" ]; then
+        echo ""
+        echo "Env vars loaded:"
+        grep -oP '(?<=^export )\w+' "$MNT_DIR/.env" 2>/dev/null | sed 's/^/  /'
+    fi
+else
+    echo "🔒 Vault is CLOSED."
+fi

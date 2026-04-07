@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Close (unmount) the encrypted credential vault, deactivate symlinks.
+set -euo pipefail
+
+MNT_DIR="$HOME/.credentialVault"
+LINKS_CONF="$HOME/.config/credentialVault/links.conf"
+
+# Remove symlinks so they don't dangle
+if [ -f "$LINKS_CONF" ]; then
+    while IFS= read -r line || [ -n "$line" ]; do
+        line="${line%%#*}"
+        [[ -z "${line// /}" ]] && continue
+        read -r _ target <<< "$line"
+        target="${target/#\~/$HOME}"
+        [ -L "$target" ] && rm -f "$target"
+    done < "$LINKS_CONF"
+fi
+
+if ! mountpoint -q "$MNT_DIR" 2>/dev/null; then
+    echo "✅ Vault is already closed."
+else
+    fusermount -u "$MNT_DIR"
+    echo "🔒 Vault closed."
+fi
