@@ -12,7 +12,8 @@ Install via apt:
 - emacs
 - figlet (required by mkbanner)
 
-Install nvm (latest stable), then Node.js LTS as the default.
+Install Node.js LTS as a system package via NodeSource apt repo (`deb.nodesource.com`).
+Install nvm (latest stable) with no default Node version — available as a fallback for projects needing a different version. System `/usr/bin/node` is primary.
 
 ## CLI Tools
 
