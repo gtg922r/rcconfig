@@ -44,6 +44,16 @@ export MACHINE_ROLE="foundryvtt"
 export MACHINE_NAME="anvil"
 ```
 
+## FoundryVTT
+
+- Install location: `~/foundryvtt/` (unzipped Linux distribution)
+- User data: `~/.local/share/FoundryVTT/` (Foundry default)
+- Run via systemd unit `foundryvtt.service` (`/etc/systemd/system/foundryvtt.service`)
+- Listens on port **3000** (within exe.dev proxy range 3000-9999)
+- UPnP disabled (`--noupnp`); access via `https://anvil.exe.xyz:3000/` once the port is set public
+- Manage: `systemctl status|restart foundryvtt`, `journalctl -u foundryvtt -f`
+- Upgrade: stop service, replace `~/foundryvtt/` contents with new release zip, start service
+
 ## Repositories
 
 (None yet — FoundryVTT install lives outside the dotfiles repo.)
