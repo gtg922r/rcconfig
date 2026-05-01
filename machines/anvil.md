@@ -23,6 +23,8 @@ Install nvm (latest stable) with no default Node version — fallback for projec
 ## npm Global Packages
 
 - `@google/gemini-cli@preview` — run with `gemini`
+- `@foundryvtt/foundryvtt-cli` — run with `fvtt`; `dataPath` configured to
+  `~/.local/share/FoundryVTT`. See the `foundryvtt-cli` Shelley skill for usage.
 
 ## Banner
 
